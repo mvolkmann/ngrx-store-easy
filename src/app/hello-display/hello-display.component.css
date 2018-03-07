@@ -1,0 +1,13 @@
+.greet {
+  color: cornflowerblue;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.json {
+  border: solid gray 2px;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px;
+}

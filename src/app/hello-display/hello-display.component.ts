@@ -5,10 +5,10 @@ import {StateService} from '../state.service';
 @Component({
   selector: 'app-hello-display',
   template: `
-    <div *ngIf="person.name">
+    <div *ngIf="person.name" class="greet">
       Hello, {{person.name}}!
     </div>
-    <div>JSON is {{person | json}}</div>
+    <pre class="json">JSON is {{person | json}}</pre>
   `,
   styleUrls: ['./hello-display.component.css']
 })
