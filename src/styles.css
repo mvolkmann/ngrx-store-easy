@@ -1,0 +1,27 @@
+/* You can add global styles to this file, and also import other style files */
+
+body {
+  font-family: sans-serif;
+}
+
+input {
+  border: solid lightgray 1px;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+input[type=checkbox],
+input[type=radio] {
+  margin-left: 0;
+}
+
+.redux-checkboxes,
+.redux-radio-buttons {
+  display: inline-block;
+}
+
+.redux-checkboxes > .item,
+.redux-radio-buttons > .item {
+  display: inline-block;
+  margin-right: 15px;
+}

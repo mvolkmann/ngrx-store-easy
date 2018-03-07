@@ -1,0 +1,11 @@
+label {
+  display: inline-block;
+  font-weight: bold;
+  margin-right: 10px;
+  text-align: right;
+  width: 100px;
+}
+
+.line {
+  margin-bottom: 10px;
+}
