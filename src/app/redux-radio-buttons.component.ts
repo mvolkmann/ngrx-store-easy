@@ -41,8 +41,7 @@ export class ReduxRadioButtonsComponent implements OnInit {
   constructor(private stateSvc: StateService) {}
 
   ngOnInit() {
-    //TODO: Should this be done in the constructor instead?
-    this.stateSvc.subscribe(this.path, value => (this.value = value));
+    this.stateSvc.watch(this, {value: this.path});
   }
 
   getName(index) {

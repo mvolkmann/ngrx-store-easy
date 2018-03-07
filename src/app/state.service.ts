@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {State, Store, select} from '@ngrx/store';
 import {AppState} from './app.model';
 import {initialState} from './initial-state';
@@ -19,8 +19,10 @@ const reducers = {
 
 type ReducerFn = (state: Object, payload?: any) => Object;
 
+type PropToPathMap = {[prop: string]: string};
+
 export const addReducer = (type: string, fn: ReducerFn) =>
-  reducers[type] = fn;
+  (reducers[type] = fn);
 
 function deepFreeze(obj, freezing = []) {
   if (Object.isFrozen(obj) || freezing.includes(obj)) return;
@@ -55,7 +57,8 @@ function filterPath(state, payload) {
   const currentValue = obj[lastPart];
   if (!Array.isArray(currentValue)) {
     throw new Error(
-      `dispatchFilter can only be used on arrays and ${path} is not`);
+      `dispatchFilter can only be used on arrays and ${path} is not`
+    );
   }
 
   const filterFn = value;
@@ -89,7 +92,8 @@ function pushPath(state, payload) {
   const currentValue = obj[lastPart];
   if (!Array.isArray(currentValue)) {
     throw new Error(
-      `dispatchPush can only be used on arrays and ${path} is not`);
+      `dispatchPush can only be used on arrays and ${path} is not`
+    );
   }
 
   obj[lastPart] = [...currentValue, ...value];
@@ -103,9 +107,11 @@ export function reducer(state = initialState, action) {
     throw new Error('action object passed to reducer must have type property');
   }
 
-  if (type.startsWith(SET) ||
-      type.startsWith(PUSH) ||
-      type.startsWith(FILTER)) {
+  if (
+    type.startsWith(SET) ||
+    type.startsWith(PUSH) ||
+    type.startsWith(FILTER)
+  ) {
     const index = type.indexOf(' ');
     type = type.substring(0, index);
   }
@@ -147,10 +153,7 @@ function setPath(state, payload) {
 
 @Injectable()
 export class StateService {
-  constructor(
-    private state: State<AppState>,
-    private store: Store<AppState>) {
-  }
+  constructor(private state: State<AppState>, private store: Store<AppState>) {}
 
   /**
    * Dispatches a Redux action with a given type and payload.
@@ -200,9 +203,16 @@ export class StateService {
 
   subscribe(path, callback) {
     // Get an observable to the path within the state.
-    const obs$ = this.store.select(
-      state => this.getPathValue(path, state));
+    const obs$ = this.store.select(state => this.getPathValue(path, state));
 
     obs$.subscribe(value => callback(value));
+  }
+
+  watch(obj: Object, propToPathMap: PropToPathMap): void {
+    Object.keys(propToPathMap).forEach(prop => {
+      // Path defaults to same as prop if not set.
+      const path = propToPathMap[prop] || prop;
+      this.subscribe(path, v => obj[prop] = v);
+    });
   }
 }

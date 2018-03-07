@@ -1,6 +1,7 @@
 {
   "name": "hello-world",
   "version": "0.0.0",
+  "description": "Angular app for learning about ngrx/store",
   "license": "MIT",
   "scripts": {
     "ng": "ng",

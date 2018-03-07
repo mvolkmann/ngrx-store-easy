@@ -45,7 +45,6 @@ export class ReduxCheckboxesComponent implements OnInit {
   }
 
   ngOnInit() {
-    //TODO: Should this be done in the constructor instead?
     this.list.forEach((obj, index) =>
       this.stateSvc.subscribe(
         obj.path,

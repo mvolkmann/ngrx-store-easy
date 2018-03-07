@@ -37,7 +37,7 @@ export class PersonFormComponent {
   ];
 
   constructor(private stateSvc: StateService) {
-    stateSvc.subscribe('person.colors', v => this.colors = v);
+    stateSvc.watch(this, {colors: 'person.colors'});
   }
 
   addColor() {

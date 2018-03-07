@@ -14,17 +14,16 @@ import {addReducer, StateService} from './state.service';
   `
 })
 export class ReduxInputComponent implements OnInit {
+  @Input() autofocus: boolean;
   @Input() path: string;
   @Input() type = 'text';
   value = '';
 
-  constructor(private stateSvc: StateService) {}
+  constructor(private stateSvc: StateService) {
+  }
 
   ngOnInit() {
-    this.stateSvc.subscribe(
-      this.path,
-      value => this.value = value
-    );
+    this.stateSvc.watch(this, {value: this.path});
   }
 
   onChange(event) {

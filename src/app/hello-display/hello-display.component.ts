@@ -16,9 +16,6 @@ export class HelloDisplayComponent {
   person = {};
 
   constructor(private stateSvc: StateService) {
-    stateSvc.subscribe(
-      'person',
-      value => this.person = value
-    );
+    stateSvc.watch(this, {person: ''});
   }
 }
