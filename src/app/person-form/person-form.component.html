@@ -38,7 +38,7 @@
   </div>
 
   <label>Colors</label>
-  <redux-input path="newColor"></redux-input>
+  <redux-input path="newColor" (enter)="addColor()"></redux-input>
   <button (click)="addColor()">&#xFF0B;</button>
   <div class="color-line" *ngFor="let color of colors">
     {{color}}

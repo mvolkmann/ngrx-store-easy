@@ -42,7 +42,9 @@ export class PersonFormComponent {
 
   addColor() {
     const color = this.stateSvc.getPathValue('newColor');
-    this.stateSvc.dispatchPush('person.colors', color);
+    if (!this.colors.includes(color)) {
+      this.stateSvc.dispatchPush('person.colors', color);
+    }
     this.stateSvc.dispatchSet('newColor', '');
   }
 

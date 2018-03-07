@@ -1,4 +1,11 @@
-import {Component, Input, NgModule, OnInit} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  NgModule,
+  OnInit,
+  Output
+} from '@angular/core';
 
 import {addReducer, StateService} from './state.service';
 
@@ -8,6 +15,7 @@ import {addReducer, StateService} from './state.service';
     <input
       [type]="type"
       [(ngModel)]="value"
+      (keypress)="onKeyPress($event)"
       (keyup)="onChange($event)"
       (change)="onChange($event)"
     >
@@ -17,10 +25,10 @@ export class ReduxInputComponent implements OnInit {
   @Input() autofocus: boolean;
   @Input() path: string;
   @Input() type = 'text';
+  @Output() enter = new EventEmitter();
   value = '';
 
-  constructor(private stateSvc: StateService) {
-  }
+  constructor(private stateSvc: StateService) {}
 
   ngOnInit() {
     this.stateSvc.watch(this, {value: this.path});
@@ -39,29 +47,11 @@ export class ReduxInputComponent implements OnInit {
 
     this.stateSvc.dispatchSet(path, v);
 
+    //TODO: Support custom change handling.
     //if (onChange) onChange(event);
-  };
-
-  /*
-  TODO: Implement onEnter support!
-  render() {
-    const {onEnter, path, type = 'text'} = this.props;
-
-    let {value} = this.props;
-    if (!value) value = getPathValue(path);
-
-    const isCheckbox = type === 'checkbox';
-    if (value === undefined) value = isCheckbox ? false : '';
-
-    const propName = isCheckbox ? 'checked' : 'value';
-    const inputProps = {...this.props, [propName]: value};
-
-    if (onEnter) {
-      inputProps.onKeyPress = event => {
-        if (event.key === 'Enter') onEnter();
-      };
-      delete inputProps.onEnter;
-    }
   }
-  */
+
+  onKeyPress(event) {
+    if (event.key === 'Enter') this.enter.emit();
+  }
 }
