@@ -37,28 +37,35 @@ See https://github.com/mvolkmann/angular-form-demo.
 
 ## Setup
 
-In the topmost source file, likely named `index.js`,
-add the following which assumes the topmost component is `App`:
+In `app.module.ts`, add the following imports:
 
 ```js
-import React from 'react';
-import {reduxSetup} from 'redux-easy';
-import App from './App';
-import './reducers'; // described next
-
-const initialState = {
-  user: {firstName: ''}
-};
-
-// The specified component is rendered in the element with
-// id "root" unless the "target" option is specified.
-reduxSetup({component: <App />, initialState});
+import {getDeclarations, getImports, StateService} from './state.service';
+import {ReduxCheckboxesComponent} from './redux-checkboxes.component';
+import {ReduxInputComponent} from './redux-input.component';
+import {ReduxRadioButtonsComponent} from './redux-radio-buttons.component';
 ```
 
-Create `reducers.js` containing something like the following:
+Add the following to the `declarations` array:
+```js
+ReduxCheckboxesComponent,
+ReduxInputComponent,
+ReduxRadioButtonsComponent,
+```
+
+Add the following to the `imports` array:
+```js
+...getImports(environment),
+```
+
+Add `StateProvider` to the `providers` array.
+
+If custom reducers are needed, define them
+like the following example in any source files
+that are loaded before the action is dispatched:
 
 ```js
-import {addReducer} from 'redux-easy';
+import {addReducer} from 'ngrx-store-easy';
 
 // Call addReducer once for each action type, giving it the
 // function to be invoked when that action type is dispatched.
@@ -76,55 +83,41 @@ addReducer('addToAge', (state, years) => {
 });
 ```
 
-If the application requires a large number of reducer functions,
-they can be implemented in multiple files,
-perhaps grouping related reducer functions together.
-
 In components that need to dispatch actions,
 do something like the following:
 
 ```js
-import React, {Component} from 'react';
-import {dispatch, watch} from 'redux-easy';
-
-class MyComponent extends Component {
-
-  onFirstNameChange = event => {
-    // assumes value comes from an input
-    const {value} = event.target;
-    dispatch('setFirstName', value);
+import {dispatch, watch} from 'ngrx-store-easy';
+...
+    // This assumes that addReducer was called earlier to define
+    // a reducer function for the action type "setFirstName".
+    dispatch('setFirstName', firstName);
 
     // If the setFirstName action just sets a value in the state,
     // perhaps user.firstName, the following can be used instead.
     // There is no need to implement simple reducer functions.
     dispatchSet('user.firstName', value);
-  }
-
-  render() {
-    const {user} = this.props;
-    return (
-      <div className="my-component">
-        <label>First Name</label>
-        <input
-          onChange={this.onFirstNameChange}
-          type="text"
-          value={user.firstName}
-        />
-      </div>
-    );
-  }
-}
-
-// The second argument to watch is a map of property names
-// to state paths where path parts are separated by periods.
-// For example, zip: 'user.address.zipCode'.
-// When the value for a prop comes from a top-level state property
-// with the same name, the path can be an empty string, null, or
-// undefined and `watch` will use the prop name as the path.
-export default watch(MyComponent, {
-  user: '' // path will be 'user'
-});
 ```
+
+In components that need to render data from the state,
+do something like the following:
+
+```js
+import {dispatch, watch} from 'ngrx-store-easy';
+...
+  constructor(private stateSvc: StateService) {
+    // The second argument to watch is a map
+    // from component properties to state paths
+    // where path parts are separated by periods.
+    // Those properties will be updated any time
+    // the state at the corresponding path changes.
+    stateSvc.watch(this, {colors: 'person.colors'});
+  }
+```
+
+When the value for a prop comes from a top-level state property
+with the same name, the path can be an empty string, null, or
+undefined and `watch` will use the prop name as the path.
 
 ## Form Elements Tied to State Paths
 
