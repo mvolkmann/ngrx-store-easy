@@ -1,12 +1,6 @@
-import {
-  Component,
-  Input,
-  NgModule,
-  OnInit,
-  Output
-} from '@angular/core';
+import {Component, Input, NgModule, OnInit, Output} from '@angular/core';
 
-import {addReducer, StateService} from './state.service';
+import {StateService} from './state.service';
 
 export interface TextPath {
   text: string;
@@ -19,7 +13,6 @@ export interface TextPath {
  * for each checkbox.
  * Specify a `className` prop to enable styling the checkboxes.
  */
-// [checked]="obj.value === value"
 @Component({
   selector: 'redux-checkboxes',
   template: `
@@ -41,15 +34,12 @@ export class ReduxCheckboxesComponent implements OnInit {
   @Input() list: TextPath[];
   @Input() values = [];
 
-  constructor(private stateSvc: StateService) {
-  }
+  constructor(private stateSvc: StateService) {}
 
   ngOnInit() {
     this.list.forEach((obj, index) =>
-      this.stateSvc.subscribe(
-        obj.path,
-        value => this.values[index] = value
-      ));
+      this.stateSvc.subscribe(obj.path, value => (this.values[index] = value))
+    );
   }
 
   getName(index) {

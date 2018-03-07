@@ -1,12 +1,21 @@
 import {Injectable} from '@angular/core';
-import {State, Store, select} from '@ngrx/store';
+import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
+import {StoreDevtoolsModule} from '@ngrx/store-devtools';
+import {throttle} from 'lodash/function';
+
 import {AppState} from './app.model';
 import {initialState} from './initial-state';
+/*
+import {ReduxCheckboxesComponent} from './redux-checkboxes.component';
+import {ReduxInputComponent} from './redux-input.component';
+import {ReduxRadioButtonsComponent} from './redux-radio-buttons.component';
+*/
 
-const FILTER = '@@filter';
-const PATH_DELIMITER = '.';
-const PUSH = '@@push';
-const SET = '@@set';
+export const FILTER = '@@filter';
+export const PATH_DELIMITER = '.';
+export const PUSH = '@@push';
+export const SET = '@@set';
+const STATE_KEY = 'reduxState';
 
 const reducers = {
   '@ngrx/store/init': () => null,
@@ -17,10 +26,9 @@ const reducers = {
   [SET]: setPath
 };
 
-type ReducerFn = (state: Object, payload?: any) => Object;
-
-type PropToPathMap = {[prop: string]: string};
-
+interface ReducerFn {
+  (state: Object, payload?: any): Object;
+}
 export const addReducer = (type: string, fn: ReducerFn) =>
   (reducers[type] = fn);
 
@@ -67,6 +75,32 @@ function filterPath(state, payload) {
   return newState;
 }
 
+export function getDeclarations() {
+  return [
+    //ReduxCheckboxesComponent,
+    //ReduxInputComponent,
+    //ReduxRadioButtonsComponent
+  ];
+}
+
+export function getImports(environment) {
+  // Redux setup using one reducer for all actions.
+  const reducerMap: ActionReducerMap<any> = {};
+  const metaReducers = [() => reducer];
+  const import1 = StoreModule.forRoot(reducerMap, {
+    initialState: loadState(),
+    metaReducers
+  });
+
+  // Redux devtools setup
+  const import2 = StoreDevtoolsModule.instrument({
+    logOnly: environment.production,
+    maxAge: 25 // # of states to retain
+  });
+
+  return [import1, import2];
+}
+
 /*
 function handleAsyncAction(promise) {
   promise
@@ -74,6 +108,28 @@ function handleAsyncAction(promise) {
     .catch(error => console.trace(error));
 }
 */
+
+/**
+ * This is called on app startup and
+ * again each time the browser window is refreshed.
+ */
+function loadState() {
+  const {sessionStorage} = window; // not available in tests
+
+  try {
+    const json = sessionStorage ? sessionStorage.getItem(STATE_KEY) : null;
+    if (!json) return initialState;
+
+    // When parsing errors Array, change to a Set.
+    return JSON.parse(
+      json,
+      (key, value) => (key === 'errors' ? new Set(value) : value)
+    );
+  } catch (e) {
+    console.error('redux-util loadState:', e.message);
+    return initialState;
+  }
+}
 
 function pushPath(state, payload) {
   const {path, value} = payload;
@@ -132,6 +188,21 @@ export function reducer(state = initialState, action) {
   return newState;
 }
 
+function saveState(state) {
+  try {
+    // When stringifying errors Set, change to an Array.
+    const json = JSON.stringify(
+      state,
+      (key, value) => (key === 'errors' ? [...state.errors] : value)
+    );
+
+    sessionStorage.setItem(STATE_KEY, json);
+  } catch (e) {
+    console.error('redux-util saveState:', e.message);
+    throw e;
+  }
+}
+
 function setPath(state, payload) {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
@@ -151,9 +222,19 @@ function setPath(state, payload) {
   return newState;
 }
 
+interface PropToPathMap {
+  [prop: string]: string;
+}
+
 @Injectable()
 export class StateService {
-  constructor(private state: State<AppState>, private store: Store<AppState>) {}
+  constructor(private state: State<AppState>, private store: Store<AppState>) {
+      this.store.subscribe(
+        throttle(
+          () => saveState(this.getState()),
+          1000,
+          {leading: false}));
+  }
 
   /**
    * Dispatches a Redux action with a given type and payload.
@@ -212,7 +293,7 @@ export class StateService {
     Object.keys(propToPathMap).forEach(prop => {
       // Path defaults to same as prop if not set.
       const path = propToPathMap[prop] || prop;
-      this.subscribe(path, v => obj[prop] = v);
+      this.subscribe(path, v => (obj[prop] = v));
     });
   }
 }

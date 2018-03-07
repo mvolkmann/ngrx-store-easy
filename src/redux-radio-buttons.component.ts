@@ -1,6 +1,6 @@
 import {Component, Input, NgModule, OnInit, Output} from '@angular/core';
 
-import {addReducer, StateService} from './state.service';
+import {StateService} from './state.service';
 
 export interface TextValue {
   text: string;
