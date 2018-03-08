@@ -44,6 +44,12 @@ function deepFreeze(obj: Object, freezing: Object[] = []) {
 }
 */
 
+function error(message: string) {
+  const err = 'ngrx-store-easy error: ' + message;
+  console.error(err);
+  //throw new Error(err);
+}
+
 function filterPath(state, payload) {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
@@ -60,7 +66,7 @@ function filterPath(state, payload) {
 
   const currentValue = obj[lastPart];
   if (!Array.isArray(currentValue)) {
-    throw new Error(
+    error(
       `dispatchFilter can only be used on arrays and ${path} is not`
     );
   }
@@ -104,7 +110,7 @@ export function loadState() {
       (key, value) => (key === 'errors' ? new Set(value) : value)
     );
   } catch (e) {
-    console.error('redux-util loadState:', e.message);
+    error(e.message);
     return initialState;
   }
 }
@@ -125,7 +131,7 @@ function pushPath(state, payload) {
 
   const currentValue = obj[lastPart];
   if (!Array.isArray(currentValue)) {
-    throw new Error(
+    error(
       `dispatchPush can only be used on arrays and ${path} is not`
     );
   }
@@ -138,7 +144,7 @@ function pushPath(state, payload) {
 export function reducer(state = initialState, action) {
   let {type} = action;
   if (!type) {
-    throw new Error('action object passed to reducer must have type property');
+    error('action object passed to reducer must have type property');
   }
 
   if (
@@ -152,7 +158,7 @@ export function reducer(state = initialState, action) {
 
   const fn = reducers[type];
   if (!fn) {
-    throw new Error(`no reducer found for action type "${type}"`);
+    error(`no reducer found for action type "${type}"`);
   }
 
   const newState = fn(state, action.payload) || state;
@@ -176,8 +182,7 @@ function saveState(state) {
 
     sessionStorage.setItem(STATE_KEY, json);
   } catch (e) {
-    console.error('redux-util saveState:', e.message);
-    throw e;
+    error(e.message);
   }
 }
 
@@ -227,7 +232,7 @@ export class StateService {
 
   dispatchFilter(path, filterFn) {
     if (typeof filterFn !== 'function') {
-      throw new Error('dispatchFilter must be passed a function');
+      error('dispatchFilter must be passed a function');
     }
 
     this.dispatch(FILTER + ' ' + path, {path, value: filterFn});
