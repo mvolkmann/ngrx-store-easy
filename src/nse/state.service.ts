@@ -20,7 +20,7 @@ const reducers = {
 
 let initialState = {};
 
-type ReducerFn = (state: Object, payload?: any) => Object;
+export type ReducerFn = (state: Object, payload?: any) => Object;
 
 /*
 function deepFreeze(obj: Object, freezing: Object[] = []) {
