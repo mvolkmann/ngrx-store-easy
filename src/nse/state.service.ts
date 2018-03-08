@@ -25,7 +25,10 @@ type ReducerFn = (state: Object, payload?: any) => Object;
 export const addReducer = (type: string, fn: ReducerFn) =>
   (reducers[type] = fn);
 
+/*
 function deepFreeze(obj: Object, freezing: Object[] = []) {
+  //TODO: When running "npm run package" it complains
+  //TODO: that includes does not exist on Object[].  Wha?
   if (Object.isFrozen(obj) || freezing.includes(obj)) return;
 
   freezing.push(obj);
@@ -40,6 +43,7 @@ function deepFreeze(obj: Object, freezing: Object[] = []) {
 
   Object.freeze(obj);
 }
+*/
 
 function filterPath(state, payload) {
   const {path, value} = payload;
@@ -76,24 +80,6 @@ export function getDeclarations() {
   ];
 }
 
-export function getImports(environment) {
-  // Redux setup using one reducer for all actions.
-  const reducerMap: ActionReducerMap<any> = {};
-  const metaReducers = [() => reducer];
-  const import1 = StoreModule.forRoot(reducerMap, {
-    initialState: loadState(),
-    metaReducers
-  });
-
-  // Redux devtools setup
-  const import2 = StoreDevtoolsModule.instrument({
-    logOnly: environment.production,
-    maxAge: 25 // # of states to retain
-  });
-
-  return [import1, import2];
-}
-
 /*
 function handleAsyncAction(promise) {
   promise
@@ -106,7 +92,7 @@ function handleAsyncAction(promise) {
  * This is called on app startup and
  * again each time the browser window is refreshed.
  */
-function loadState() {
+export function loadState() {
   const {sessionStorage} = window; // not available in tests
 
   try {
@@ -177,7 +163,7 @@ export function reducer(state = initialState, action) {
     return state;
   }
 
-  deepFreeze(newState);
+  //deepFreeze(newState);
   return newState;
 }
 
@@ -215,7 +201,7 @@ function setPath(state, payload) {
   return newState;
 }
 
-interface PropToPathMap {
+export interface PropToPathMap {
   [prop: string]: string;
 }
 
