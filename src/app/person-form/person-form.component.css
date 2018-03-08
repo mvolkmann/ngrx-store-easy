@@ -1,0 +1,16 @@
+.color-line {
+  margin-left: 115px;
+}
+
+label {
+  display: inline-block;
+  font-weight: bold;
+  margin-right: 10px;
+  text-align: right;
+  vertical-align: top;
+  width: 100px;
+}
+
+.line {
+  margin-bottom: 10px;
+}

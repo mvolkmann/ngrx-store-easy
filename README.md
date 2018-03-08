@@ -41,16 +41,18 @@ In `app.module.ts`, add the following imports:
 
 ```js
 import {getDeclarations, getImports, StateService} from './state.service';
-import {ReduxCheckboxesComponent} from './redux-checkboxes.component';
-import {ReduxInputComponent} from './redux-input.component';
-import {ReduxRadioButtonsComponent} from './redux-radio-buttons.component';
+import {ReduxCheckboxesComponent} from './nse-checkboxes.component';
+import {ReduxInputComponent} from './nse-input.component';
+import {ReduxRadioButtonsComponent} from './nse-radio-buttons.component';
 ```
 
 Add the following to the `declarations` array:
 ```js
-ReduxCheckboxesComponent,
-ReduxInputComponent,
-ReduxRadioButtonsComponent,
+NseCheckboxesComponent,
+NseInputComponent,
+NseRadioButtonsComponent,
+NseSelectComponent,
+NseTextAreaComponent,
 ```
 
 Add the following to the `imports` array:
@@ -124,51 +126,51 @@ undefined and `watch` will use the prop name as the path.
 It is common to have `input`, `select`, and `textarea` elements
 with `onChange` handlers that get their value from `event.target.value`
 and dispatch an action where the value is the payload.
-An alternative is to use the provided `redux-input`, `redux-select`,
-and `redux-textarea` components as follows:
+An alternative is to use the provided `nse-input`, `nse-select`,
+and `nse-textarea` components as follows:
 
-HTML `input` elements can be replaced by the `redux-input` component.
+HTML `input` elements can be replaced by the `nse-input` component.
 For example,
 ```js
-<redux-input path="user.firstName"></redux-input>
+<nse-input path="user.firstName"></nse-input>
 ```
 
 The `type` property defaults to `'text'`,
 but can be set to any valid value including `'checkbox'`.
 
-The value used by the `redux-input` is the state value at the specified path.
+The value used by the `nse-input` is the state value at the specified path.
 When the user changes the value, this component
 updates the value at that path in the state.
 
 To perform additional processing of changes such as validation,
 supply an `onChange` prop that refers to a function (coming soon).
 
-HTML `textarea` elements can be replaced by the `redux-textarea` component.
+HTML `textarea` elements can be replaced by the `nse-textarea` component.
 For example,
 ```js
-<redux-textarea path="feedback.comment"></redux-textarea>
+<nse-textarea path="feedback.comment"></nse-textarea>
 ```
 
-HTML `select` elements can be replaced by the `redux-textarea` component.
+HTML `select` elements can be replaced by the `nse-textarea` component.
 For example,
 ```js
-<redux-select path="user.favoriteColor">
+<nse-select path="user.favoriteColor">
   <option>red</option>
   <option>green</option>
   <option>blue</option>
-</redux-select>
+</nse-select>
 ```
 If the `option` elements have a value attribute, that value
 will be used instead of the text inside the `option`.
 
-For a set of radio buttons, use the `redux-radio-buttons` component.
+For a set of radio buttons, use the `nse-radio-buttons` component.
 For example,
 ```js
-<redux-radio-buttons
+<nse-radio-buttons
   class="flavor"
   [list]="radioButtonList"
   path="favoriteFlavor"
-></redux-radio-buttons>
+></nse-radio-buttons>
 ```
 where radioButtonList is a component property that is set as follows:
 ```js
@@ -181,10 +183,10 @@ const radioButtonList = [
 When a radio button is clicked the state property `favoriteFlavor`
 will be set the value of that radio button.
 
-For a set of checkboxes, use the `redux-checkboxes` component.
+For a set of checkboxes, use the `nse-checkboxes` component.
 For example,
 ```js
-<redux-checkboxes class="colors" [list]="checkboxList"></redux-checkboxes>
+<nse-checkboxes class="colors" [list]="checkboxList"></nse-checkboxes>
 ```
 where checkboxList is set as follows:
 ```js

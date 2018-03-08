@@ -3,13 +3,8 @@ import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {throttle} from 'lodash/function';
 
-import {AppState} from './app.model';
-import {initialState} from './initial-state';
-/*
-import {ReduxCheckboxesComponent} from './redux-checkboxes.component';
-import {ReduxInputComponent} from './redux-input.component';
-import {ReduxRadioButtonsComponent} from './redux-radio-buttons.component';
-*/
+import {AppState} from '../model';
+import {initialState} from '../initial-state';
 
 export const FILTER = '@@filter';
 export const PATH_DELIMITER = '.';
@@ -26,13 +21,11 @@ const reducers = {
   [SET]: setPath
 };
 
-interface ReducerFn {
-  (state: Object, payload?: any): Object;
-}
+type ReducerFn = (state: Object, payload?: any) => Object;
 export const addReducer = (type: string, fn: ReducerFn) =>
   (reducers[type] = fn);
 
-function deepFreeze(obj, freezing = []) {
+function deepFreeze(obj: Object, freezing: Object[] = []) {
   if (Object.isFrozen(obj) || freezing.includes(obj)) return;
 
   freezing.push(obj);

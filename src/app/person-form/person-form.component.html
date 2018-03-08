@@ -1,0 +1,57 @@
+<div>
+  <div class="line">
+    <label>Name</label>
+    <nse-input autofocus path="person.name"></nse-input>
+  </div>
+  <div class="line">
+    <label>Name 2</label>
+    <nse-input path="person.name"></nse-input>
+  </div>
+
+  <div class="line">
+    <label>Age</label>
+    <nse-input path="person.age" type="number"></nse-input>
+  </div>
+
+  <div class="line">
+    <label>Comments</label>
+    <nse-textarea path="person.comments"></nse-textarea>
+  </div>
+
+  <div class="line">
+    <label></label>
+    <nse-input path="person.employed" type="checkbox"></nse-input>
+    <span>Employed</span>
+  </div>
+
+  <div class="line">
+    <label>Direction</label>
+    <nse-radio-buttons path="person.direction" [list]="directionList">
+    </nse-radio-buttons>
+  </div>
+  <div class="line">
+    <label>Direction 2</label>
+    <nse-select path="person.direction" [list]="directionList">
+    </nse-select>
+  </div>
+  <div>
+    <button (click)="pickIdle()">Pick Idle</button>
+  </div>
+
+  <div class="line">
+    <label>Availability</label>
+    <nse-checkboxes [list]="availabilityList">
+    </nse-checkboxes>
+  </div>
+  <div>
+    <button (click)="pickEvening()">Pick Evening</button>
+  </div>
+
+  <label>Colors</label>
+  <nse-input path="newColor" (enter)="addColor()"></nse-input>
+  <button (click)="addColor()">&#xFF0B;</button>
+  <div class="color-line" *ngFor="let color of colors">
+    {{color}}
+    <button (click)="deleteColor(color)">&#x2715;</button>
+  </div>
+</div>

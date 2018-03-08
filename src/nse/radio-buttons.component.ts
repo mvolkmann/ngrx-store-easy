@@ -1,4 +1,4 @@
-import {Component, Input, NgModule, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit, Output} from '@angular/core';
 
 import {StateService} from './state.service';
 
@@ -13,11 +13,10 @@ export interface TextValue {
  * for each radio button.
  * Specify a `className` prop to enable styling the radio buttons.
  */
-// [checked]="obj.value === value"
 @Component({
-  selector: 'redux-radio-buttons',
+  selector: 'nse-radio-buttons',
   template: `
-    <div className="{{'redux-radio-buttons ' + className}}">
+    <div className="{{'nse-radio-buttons ' + className}}">
       <div *ngFor="let obj of list; let i = index" class="item">
         <input
           [checked]="obj.value == value"
@@ -32,7 +31,7 @@ export interface TextValue {
     </div>
   `
 })
-export class ReduxRadioButtonsComponent implements OnInit {
+export class RadioButtonsComponent implements OnInit {
   @Input() className = '';
   @Input() list: TextValue[];
   @Input() path = '';

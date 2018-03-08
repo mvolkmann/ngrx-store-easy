@@ -14,9 +14,9 @@ export interface TextPath {
  * Specify a `className` prop to enable styling the checkboxes.
  */
 @Component({
-  selector: 'redux-checkboxes',
+  selector: 'nse-checkboxes',
   template: `
-    <div className="{{'redux-checkboxes ' + className}}">
+    <div className="{{'nse-checkboxes ' + className}}">
       <div *ngFor="let obj of list; let i = index" class="item">
         <input
           [checked]="values[i]"
@@ -29,7 +29,7 @@ export interface TextPath {
     </div>
   `
 })
-export class ReduxCheckboxesComponent implements OnInit {
+export class CheckboxesComponent implements OnInit {
   @Input() className = '';
   @Input() list: TextPath[];
   @Input() values = [];
