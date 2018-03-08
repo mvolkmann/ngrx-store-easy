@@ -17,19 +17,12 @@ import {CheckboxesComponent} from './checkboxes.component';
 import {InputComponent} from './input.component';
 import {RadioButtonsComponent} from './radio-buttons.component';
 import {SelectComponent} from './select.component';
-import {loadState, reducer, StateService} from './state.service';
+import {metaReducers, StateService} from './state.service';
 import {TextAreaComponent} from './textarea.component';
-
-// ng-packagr doesn't allow use of an anonymous function here.
-//const metaReducers = [() => reducer];
-export function getReducer() {
-  return reducer;
-}
-export const metaReducers = [getReducer];
 
 const reducerMap: ActionReducerMap<any> = {};
 const store = StoreModule.forRoot(reducerMap, {
-  initialState: loadState(),
+  initialState: {},
   metaReducers
 });
 

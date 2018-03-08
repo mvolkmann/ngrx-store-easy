@@ -232,3 +232,11 @@ addReducer('myAsyncThing', (state, payload) => {
 
 That's everything to you need to know to use ngrx-store-easy.
 Code simply!
+
+## Reminders for maintainers
+
+To release a new version:
+1. bump version in package.json
+2. check in and push all changes
+3. npm run package
+4. npm run publish

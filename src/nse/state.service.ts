@@ -4,6 +4,7 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {throttle} from 'lodash/function';
 
 export const FILTER = '@@filter';
+export const INIT = '@@init';
 export const PATH_DELIMITER = '.';
 export const PUSH = '@@push';
 export const SET = '@@set';
@@ -14,11 +15,19 @@ const reducers = {
   '@@redux/INIT': () => null,
   '@@async': (state, payload) => payload,
   [FILTER]: filterPath,
+  [INIT]: initState,
   [PUSH]: pushPath,
   [SET]: setPath
 };
 
 let initialState = {};
+
+// ng-packagr doesn't allow use of an anonymous function here.
+//const metaReducers = [() => reducer];
+export function getReducer() {
+  return reducer;
+}
+export const metaReducers = [getReducer];
 
 export type ReducerFn = (state: Object, payload?: any) => Object;
 
@@ -83,6 +92,10 @@ function handleAsyncAction(promise) {
 }
 */
 
+function initState(state, payload) {
+  return payload;
+}
+
 /**
  * This is called on app startup and
  * again each time the browser window is refreshed.
@@ -92,13 +105,7 @@ export function loadState() {
 
   try {
     const json = sessionStorage ? sessionStorage.getItem(STATE_KEY) : null;
-    if (!json) return initialState;
-
-    // When parsing errors Array, change to a Set.
-    return JSON.parse(
-      json,
-      (key, value) => (key === 'errors' ? new Set(value) : value)
-    );
+    return json ? JSON.parse(json) : initialState;
   } catch (e) {
     error(e.message);
     return initialState;
@@ -256,7 +263,9 @@ export class StateService {
   }
 
   setInitialState(state): void {
-    initialState = state;
+    const sessionState = loadState();
+    initialState = sessionState || state;
+    this.dispatch(INIT, initialState);
   }
 
   subscribe(path, callback): void {

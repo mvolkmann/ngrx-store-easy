@@ -13,6 +13,7 @@ import {initialState} from '../initial-state';
 })
 export class AppComponent {
   constructor(private stateSvc: StateService) {
+    console.log('app.component.ts ctor: initialState =', initialState);
     stateSvc.setInitialState(initialState);
   }
 }
