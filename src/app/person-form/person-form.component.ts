@@ -1,21 +1,9 @@
 import {Component} from '@angular/core';
 
 import {AppState} from '../../model';
-import {addReducer, StateService} from '../../nse/state.service';
+import {StateService} from '../../nse/state.service';
 import {TextPath} from '../../nse/checkboxes.component';
 import {TextValue} from '../../nse/radio-buttons.component';
-
-addReducer('shout', (state: AppState) => {
-  const {person} = state;
-  const {name} = person;
-  return {
-    ...state,
-    person: {
-      ...person,
-      name: name.toUpperCase()
-    }
-  };
-});
 
 @Component({
   selector: 'app-person-form',
@@ -38,11 +26,24 @@ export class PersonFormComponent {
 
   constructor(private stateSvc: StateService) {
     stateSvc.watch(this, {colors: 'person.colors'});
+
+    // Just an example of writing a custom reducer function.
+    stateSvc.addReducer('shout', (state: AppState) => {
+      const {person} = state;
+      const {name} = person;
+      return {
+        ...state,
+        person: {
+          ...person,
+          name: name.toUpperCase()
+        }
+      };
+    });
   }
 
   addColor() {
     const color = this.stateSvc.getPathValue('newColor');
-    if (!this.colors.includes(color)) {
+    if (!this.colors || !this.colors.includes(color)) {
       this.stateSvc.dispatchPush('person.colors', color);
     }
     this.stateSvc.dispatchSet('newColor', '');

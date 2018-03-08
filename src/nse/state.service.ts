@@ -18,11 +18,9 @@ const reducers = {
   [SET]: setPath
 };
 
-let initialState;
+let initialState = {};
 
 type ReducerFn = (state: Object, payload?: any) => Object;
-export const addReducer = (type: string, fn: ReducerFn) =>
-  (reducers[type] = fn);
 
 /*
 function deepFreeze(obj: Object, freezing: Object[] = []) {
@@ -77,14 +75,6 @@ function filterPath(state, payload) {
   return newState;
 }
 
-export function getDeclarations() {
-  return [
-    //ReduxCheckboxesComponent,
-    //ReduxInputComponent,
-    //ReduxRadioButtonsComponent
-  ];
-}
-
 /*
 function handleAsyncAction(promise) {
   promise
@@ -129,12 +119,8 @@ function pushPath(state, payload) {
     obj = newV;
   }
 
-  const currentValue = obj[lastPart];
-  if (!Array.isArray(currentValue)) {
-    error(
-      `dispatchPush can only be used on arrays and ${path} is not`
-    );
-  }
+  let currentValue = obj[lastPart];
+  if (!Array.isArray(currentValue)) currentValue = [];
 
   obj[lastPart] = [...currentValue, ...value];
 
@@ -186,10 +172,6 @@ function saveState(state) {
   }
 }
 
-export function setInitialState(state) {
-  initialState = state;
-}
-
 function setPath(state, payload) {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
@@ -223,14 +205,18 @@ export class StateService {
           {leading: false}));
   }
 
+  addReducer(type: string, fn: ReducerFn): void {
+    reducers[type] = fn;
+  }
+
   /**
    * Dispatches a Redux action with a given type and payload.
    */
-  dispatch(type: string, payload?: any) {
+  dispatch(type: string, payload?: any): void {
     this.store.dispatch({type, payload});
   }
 
-  dispatchFilter(path, filterFn) {
+  dispatchFilter(path, filterFn): void {
     if (typeof filterFn !== 'function') {
       error('dispatchFilter must be passed a function');
     }
@@ -241,7 +227,7 @@ export class StateService {
   /**
    * This adds elements to the end of the array at path.
    */
-  dispatchPush(path, ...elements) {
+  dispatchPush(path, ...elements): void {
     this.dispatch(PUSH + ' ' + path, {path, value: elements});
   }
 
@@ -249,7 +235,7 @@ export class StateService {
    * Dispatches a Redux action that sets
    * the value found at path to a given value.
    */
-  dispatchSet(path: string, value: any) {
+  dispatchSet(path: string, value: any): void {
     this.dispatch(SET + ' ' + path, {path, value});
   }
 
@@ -269,7 +255,11 @@ export class StateService {
     return this.state.getValue();
   }
 
-  subscribe(path, callback) {
+  setInitialState(state): void {
+    initialState = state;
+  }
+
+  subscribe(path, callback): void {
     // Get an observable to the path within the state.
     const obs$ = this.store.select(state => this.getPathValue(path, state));
 
