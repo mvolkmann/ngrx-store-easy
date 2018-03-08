@@ -20,12 +20,19 @@ import {SelectComponent} from './select.component';
 import {loadState, reducer, StateService} from './state.service';
 import {TextAreaComponent} from './textarea.component';
 
+// ng-packagr doesn't allow use of an anonymous function here.
+//const metaReducers = [() => reducer];
+export function getReducer() {
+  return reducer;
+}
+export const metaReducers = [getReducer];
+
 const reducerMap: ActionReducerMap<any> = {};
-const metaReducers = [() => reducer];
 const store = StoreModule.forRoot(reducerMap, {
   initialState: loadState(),
   metaReducers
 });
+
 const storeDevTools = StoreDevtoolsModule.instrument({
   logOnly: environment.production,
   maxAge: 25 // # of states to retain

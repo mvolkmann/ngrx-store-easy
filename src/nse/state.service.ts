@@ -3,9 +3,6 @@ import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {throttle} from 'lodash/function';
 
-import {AppState} from '../model';
-import {initialState} from '../initial-state';
-
 export const FILTER = '@@filter';
 export const PATH_DELIMITER = '.';
 export const PUSH = '@@push';
@@ -20,6 +17,8 @@ const reducers = {
   [PUSH]: pushPath,
   [SET]: setPath
 };
+
+let initialState;
 
 type ReducerFn = (state: Object, payload?: any) => Object;
 export const addReducer = (type: string, fn: ReducerFn) =>
@@ -182,6 +181,10 @@ function saveState(state) {
   }
 }
 
+export function setInitialState(state) {
+  initialState = state;
+}
+
 function setPath(state, payload) {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
@@ -207,7 +210,7 @@ export interface PropToPathMap {
 
 @Injectable()
 export class StateService {
-  constructor(private state: State<AppState>, private store: Store<AppState>) {
+  constructor(private state: State<Object>, private store: Store<Object>) {
       this.store.subscribe(
         throttle(
           () => saveState(this.getState()),
@@ -245,7 +248,7 @@ export class StateService {
     this.dispatch(SET + ' ' + path, {path, value});
   }
 
-  getPathValue(path: string, state?: AppState): any {
+  getPathValue(path: string, state?: Object): any {
     if (!path) return undefined;
 
     let value = state || this.getState();
@@ -257,7 +260,7 @@ export class StateService {
     return value;
   }
 
-  getState(): AppState {
+  getState(): Object {
     return this.state.getValue();
   }
 
