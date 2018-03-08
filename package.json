@@ -12,6 +12,7 @@
     "lint": "ng lint",
     "ng": "ng",
     "package": "ng-packagr -p ng-package.json; pushd dist; npm pack",
+    "publish": "npm publish dist",
     "start": "ng serve",
     "test": "ng test"
   },
