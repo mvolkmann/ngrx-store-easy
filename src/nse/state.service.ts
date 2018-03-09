@@ -5,6 +5,7 @@ import {throttle} from 'lodash/function';
 
 export const FILTER = '@@filter';
 export const INIT = '@@init';
+export const MAP = '@@map';
 export const PATH_DELIMITER = '.';
 export const PUSH = '@@push';
 export const SET = '@@set';
@@ -16,6 +17,7 @@ const reducers = {
   '@@async': (state, payload) => payload,
   [FILTER]: filterPath,
   [INIT]: initState,
+  [MAP]: mapPath,
   [PUSH]: pushPath,
   [SET]: setPath
 };
@@ -112,6 +114,32 @@ export function loadState() {
   }
 }
 
+function mapPath(state, payload) {
+  const {path, value} = payload;
+  const parts = path.split(PATH_DELIMITER);
+  const lastPart = parts.pop();
+  const newState = {...state};
+
+  let obj = newState;
+  for (const part of parts) {
+    const v = obj[part];
+    const newV = {...v};
+    obj[part] = newV;
+    obj = newV;
+  }
+
+  const currentValue = obj[lastPart];
+  if (!Array.isArray(currentValue)) {
+    throw new Error(
+      `dispatchMap can only be used on arrays and ${path} is not`);
+  }
+
+  const mapFn = value;
+  obj[lastPart] = currentValue.map(mapFn);
+
+  return newState;
+}
+
 function pushPath(state, payload) {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
@@ -143,7 +171,8 @@ export function reducer(state = initialState, action) {
   if (
     type.startsWith(SET) ||
     type.startsWith(PUSH) ||
-    type.startsWith(FILTER)
+    type.startsWith(FILTER) ||
+    type.startsWith(MAP)
   ) {
     const index = type.indexOf(' ');
     type = type.substring(0, index);
@@ -223,12 +252,31 @@ export class StateService {
     this.store.dispatch({type, payload});
   }
 
-  dispatchFilter(path, filterFn): void {
+  /**
+   * This removes elements from the array at path.
+   * filterFn must be a function that takes an array element
+   * and returns a boolean indicating
+   * whether the element should be retained.
+   */
+  dispatchFilter(path: string, filterFn): void {
     if (typeof filterFn !== 'function') {
       error('dispatchFilter must be passed a function');
     }
 
     this.dispatch(FILTER + ' ' + path, {path, value: filterFn});
+  }
+
+  /**
+   * This updates elements in the array at path.
+   * mapFn must be a function that takes an array element
+   * and returns new value for the element.
+   */
+  dispatchMap(path: string, mapFn): void {
+    if (typeof mapFn !== 'function') {
+      throw new Error('dispatchMap must be passed a function');
+    }
+
+    this.dispatch(MAP + ' ' + path, {path, value: mapFn});
   }
 
   /**
