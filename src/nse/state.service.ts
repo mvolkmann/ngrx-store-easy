@@ -1,14 +1,14 @@
 import {Injectable} from '@angular/core';
 import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
-import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {throttle} from 'lodash/function';
 
-export const FILTER = '@@filter';
-export const INIT = '@@init';
-export const MAP = '@@map';
-export const PATH_DELIMITER = '.';
-export const PUSH = '@@push';
-export const SET = '@@set';
+const FILTER = '@@filter';
+const INIT = '@@init';
+const MAP = '@@map';
+const PATH_DELIMITER = '.';
+const PUSH = '@@push';
+const SET = '@@set';
+const TRANSFORM = '@@transform';
 const STATE_KEY = 'reduxState';
 
 const reducers = {
@@ -19,7 +19,8 @@ const reducers = {
   [INIT]: initState,
   [MAP]: mapPath,
   [PUSH]: pushPath,
-  [SET]: setPath
+  [SET]: setPath,
+  [TRANSFORM]: transformPath
 };
 
 let initialState = {};
@@ -32,6 +33,8 @@ export function getReducer() {
 export const metaReducers = [getReducer];
 
 export type ReducerFn = (state: Object, payload?: any) => Object;
+
+type TransformFn = <T>(value: T) => T;
 
 /*
 function deepFreeze(obj: Object, freezing: Object[] = []) {
@@ -170,6 +173,7 @@ export function reducer(state = initialState, action) {
 
   if (
     type.startsWith(SET) ||
+    type.startsWith(TRANSFORM) ||
     type.startsWith(PUSH) ||
     type.startsWith(FILTER) ||
     type.startsWith(MAP)
@@ -223,6 +227,27 @@ function setPath(state, payload) {
   }
 
   obj[lastPart] = value;
+
+  return newState;
+}
+
+function transformPath(state, payload) {
+  const {path, value} = payload;
+  const parts = path.split(PATH_DELIMITER);
+  const lastPart = parts.pop();
+  const newState = {...state};
+
+  let obj = newState;
+  for (const part of parts) {
+    const v = obj[part];
+    const newV = {...v};
+    obj[part] = newV;
+    obj = newV;
+  }
+
+  const fn = value;
+  const currentValue = obj[lastPart];
+  obj[lastPart] = fn(currentValue);
 
   return newState;
 }
@@ -294,6 +319,10 @@ export class StateService {
     this.dispatch(SET + ' ' + path, {path, value});
   }
 
+  dispatchTransform(path: string, value: TransformFn) {
+    this.dispatch(TRANSFORM + ' ' + path, {path, value});
+  }
+
   getPathValue(path: string, state?: Object): any {
     if (!path) return undefined;
 
@@ -312,7 +341,8 @@ export class StateService {
 
   setInitialState(state): void {
     const sessionState = loadState();
-    initialState = sessionState || state;
+    const haveSession = sessionState && Object.keys(sessionState).length > 0;
+    initialState = haveSession ? sessionState : state;
     this.dispatch(INIT, initialState);
   }
 
