@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
 
 import {AppState} from '../../model';
 import {StateService} from '../../nse/state.service';
@@ -8,7 +8,8 @@ import {TextValue} from '../../nse/radio-buttons.component';
 @Component({
   selector: 'app-person-form',
   templateUrl: './person-form.component.html',
-  styleUrls: ['./person-form.component.css']
+  styleUrls: ['./person-form.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PersonFormComponent {
   availabilityList: TextPath[] = [
@@ -24,7 +25,10 @@ export class PersonFormComponent {
     {text: 'Reverse', value: 3}
   ];
 
-  constructor(private stateSvc: StateService) {
+  constructor(
+    public cd: ChangeDetectorRef,
+    private stateSvc: StateService
+  ) {
     stateSvc.watch(this, {colors: 'person.colors'});
 
     // Just an example of writing a custom reducer function.

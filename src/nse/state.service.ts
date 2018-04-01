@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
 import {throttle} from 'lodash/function';
 
+const DELETE = '@@delete';
 const FILTER = '@@filter';
 const INIT = '@@init';
 const MAP = '@@map';
@@ -15,6 +16,7 @@ const reducers = {
   '@ngrx/store/init': () => null,
   '@@redux/INIT': () => null,
   '@@async': (state, payload) => payload,
+  [DELETE]: deletePath,
   [FILTER]: filterPath,
   [INIT]: initState,
   [MAP]: mapPath,
@@ -55,6 +57,25 @@ function deepFreeze(obj: Object, freezing: Object[] = []) {
   Object.freeze(obj);
 }
 */
+
+function deletePath(state, payload) {
+  const path = payload;
+  const parts = path.split(PATH_DELIMITER);
+  const lastPart = parts.pop();
+  const newState = {...state};
+
+  let obj = newState;
+  for (const part of parts) {
+    const v = obj[part];
+    const newV = {...v};
+    obj[part] = newV;
+    obj = newV;
+  }
+
+  delete obj[lastPart];
+
+  return newState;
+}
 
 function error(message: string) {
   const err = 'ngrx-store-easy error: ' + message;
@@ -278,6 +299,13 @@ export class StateService {
   }
 
   /**
+  * This deletes the property at path.
+  */
+  dispatchDelete(path) {
+    this.dispatch(DELETE + ' ' + path, path);
+  }
+
+  /**
    * This removes elements from the array at path.
    * filterFn must be a function that takes an array element
    * and returns a boolean indicating
@@ -348,7 +376,10 @@ export class StateService {
 
   subscribe(path, callback): void {
     // Get an observable to the path within the state.
+    // This works.  Components looking at the same path do get updated.
     const obs$ = this.store.select(state => this.getPathValue(path, state));
+    // This does not work.  Components looking at the same path don't get updated.
+    //const obs$ = this.store.pipe(select(path));
 
     obs$.subscribe(value => callback(value));
   }
@@ -357,7 +388,14 @@ export class StateService {
     Object.keys(propToPathMap).forEach(prop => {
       // Path defaults to same as prop if not set.
       const path = propToPathMap[prop] || prop;
-      this.subscribe(path, v => (obj[prop] = v));
+      //this.subscribe(path, v => (obj[prop] = v));
+      this.subscribe(path, v => {
+        console.log('state.service.ts watch:', prop, 'changed to', v, 'in', obj);
+        obj[prop] = v;
+        const cd = obj['cd'];
+        console.log('state.service.ts watch: cd =', cd);
+        if (cd) cd.markForCheck();
+      });
     });
   }
 }

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
 
 import {StateService} from '../../nse/state.service';
 
@@ -10,12 +10,16 @@ import {StateService} from '../../nse/state.service';
     </div>
     <pre class="json">JSON is {{person | json}}</pre>
   `,
-  styleUrls: ['./hello-display.component.css']
+  styleUrls: ['./hello-display.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HelloDisplayComponent {
   person = {};
 
-  constructor(private stateSvc: StateService) {
+  constructor(
+    public cd: ChangeDetectorRef,
+    private stateSvc: StateService
+  ) {
     stateSvc.watch(this, {person: ''});
   }
 }
