@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {ChangeDetectorRef, Injectable} from '@angular/core';
 import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
 import {throttle} from 'lodash/function';
 
@@ -382,10 +382,33 @@ export class StateService {
       const path = propToPathMap[prop] || prop;
       this.subscribe(path, v => {
         obj[prop] = v;
+        /*
         const cd = obj['cd'];
-        //if (cd) cd.detectChanges();
         if (cd) cd.markForCheck();
+        */
+        if (obj instanceof HasChangeDetector) obj.markForCheck();
       });
     });
+  }
+}
+
+/**
+ * Components that set changeDetection to ChangeDetectionStrategy.OnPush should
+ * 1) extend this class
+ * 2) inject ChangeDetectorRef into their constructor
+ * 3) pass it to super
+ * For example,
+ * export class Demo extends HasChangeDetector {
+ *   constructor(cd: ChangeDetectorRef, private stateSvc: StateService) {
+ *     super(cd);
+ *     stateSvc.watch(this, {color: 'car.color'});
+ *   }
+ * }
+ */
+export class HasChangeDetector {
+  constructor(private cd: ChangeDetectorRef) {}
+
+  markForCheck() {
+    this.cd.markForCheck();
   }
 }

@@ -4,7 +4,7 @@ import {
   Component
 } from '@angular/core';
 
-import {StateService} from '../../nse/state.service';
+import {HasChangeDetector, StateService} from '../../nse/state.service';
 import {TextPath} from '../../nse/checkboxes.component';
 import {TextValue} from '../../nse/radio-buttons.component';
 
@@ -14,7 +14,7 @@ import {TextValue} from '../../nse/radio-buttons.component';
   styleUrls: ['./person-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PersonFormComponent {
+export class PersonFormComponent extends HasChangeDetector {
   availabilityList: TextPath[] = [
     {text: 'Morning', path: 'person.morning'},
     {text: 'Evening', path: 'person.evening'}
@@ -28,7 +28,8 @@ export class PersonFormComponent {
     {text: 'Reverse', value: 3}
   ];
 
-  constructor(public cd: ChangeDetectorRef, private stateSvc: StateService) {
+  constructor(cd: ChangeDetectorRef, private stateSvc: StateService) {
+    super(cd);
     stateSvc.watch(this, {colors: 'person.colors'});
   }
 

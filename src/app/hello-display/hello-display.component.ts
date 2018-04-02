@@ -4,7 +4,7 @@ import {
   Component
 } from '@angular/core';
 
-import {StateService} from '../../nse/state.service';
+import {HasChangeDetector, StateService} from '../../nse/state.service';
 
 @Component({
   selector: 'app-hello-display',
@@ -17,10 +17,11 @@ import {StateService} from '../../nse/state.service';
   styleUrls: ['./hello-display.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HelloDisplayComponent {
+export class HelloDisplayComponent extends HasChangeDetector {
   person = {};
 
-  constructor(public cd: ChangeDetectorRef, private stateSvc: StateService) {
+  constructor(cd: ChangeDetectorRef, private stateSvc: StateService) {
+    super(cd);
     stateSvc.watch(this, {person: ''});
   }
 }
