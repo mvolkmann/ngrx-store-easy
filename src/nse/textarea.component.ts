@@ -24,6 +24,6 @@ export class TextAreaComponent implements OnInit {
   }
 
   onChange(event) {
-    this.stateSvc.dispatchSet(this.path, event.target.value);
+    this.stateSvc.dispatchSet(this.path, '', event.target.value);
   }
 }

@@ -47,6 +47,6 @@ export class CheckboxesComponent implements OnInit {
   }
 
   onChange(event, path) {
-    this.stateSvc.dispatchSet(path, event.target.checked);
+    this.stateSvc.dispatchSet(path, true, event.target.checked);
   }
 }

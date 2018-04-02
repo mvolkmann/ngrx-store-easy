@@ -36,9 +36,6 @@ export const metaReducers = [getReducer];
 
 export type ReducerFn = (state: Object, payload?: any) => Object;
 
-type TransformFn = <T>(value: T) => T;
-
-/*
 function deepFreeze(obj: Object, freezing: Object[] = []) {
   //TODO: When running "npm run package" it complains
   //TODO: that includes does not exist on Object[].  Wha?
@@ -56,7 +53,6 @@ function deepFreeze(obj: Object, freezing: Object[] = []) {
 
   Object.freeze(obj);
 }
-*/
 
 function deletePath(state, payload) {
   const path = payload;
@@ -77,12 +73,6 @@ function deletePath(state, payload) {
   return newState;
 }
 
-function error(message: string) {
-  const err = 'ngrx-store-easy error: ' + message;
-  console.error(err);
-  //throw new Error(err);
-}
-
 function filterPath(state, payload) {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
@@ -99,9 +89,7 @@ function filterPath(state, payload) {
 
   const currentValue = obj[lastPart];
   if (!Array.isArray(currentValue)) {
-    error(
-      `dispatchFilter can only be used on arrays and ${path} is not`
-    );
+    handleError(`dispatchFilter can only be used on arrays and ${path} is not`);
   }
 
   const filterFn = value;
@@ -110,13 +98,11 @@ function filterPath(state, payload) {
   return newState;
 }
 
-/*
-function handleAsyncAction(promise) {
-  promise
-    .then(newState => dispatch('@@async', newState))
-    .catch(error => console.trace(error));
+function handleError(message: string) {
+  const err = 'ngrx-store-easy error: ' + message;
+  console.error(err);
+  //throw new Error(err);
 }
-*/
 
 function initState(state, payload) {
   return payload;
@@ -133,7 +119,7 @@ export function loadState() {
     const json = sessionStorage ? sessionStorage.getItem(STATE_KEY) : null;
     return json ? JSON.parse(json) : initialState;
   } catch (e) {
-    error(e.message);
+    handleError(e.message);
     return initialState;
   }
 }
@@ -155,7 +141,8 @@ function mapPath(state, payload) {
   const currentValue = obj[lastPart];
   if (!Array.isArray(currentValue)) {
     throw new Error(
-      `dispatchMap can only be used on arrays and ${path} is not`);
+      `dispatchMap can only be used on arrays and ${path} is not`
+    );
   }
 
   const mapFn = value;
@@ -189,7 +176,7 @@ function pushPath(state, payload) {
 export function reducer(state = initialState, action) {
   let {type} = action;
   if (!type) {
-    error('action object passed to reducer must have type property');
+    handleError('action object passed to reducer must have type property');
   }
 
   if (
@@ -205,17 +192,17 @@ export function reducer(state = initialState, action) {
 
   const fn = reducers[type];
   if (!fn) {
-    error(`no reducer found for action type "${type}"`);
+    handleError(`no reducer found for action type "${type}"`);
   }
 
   const newState = fn(state, action.payload) || state;
 
   if (newState instanceof Promise) {
-    //handleAsyncAction(newState);
+    this.handleAsyncAction(newState);
     return state;
   }
 
-  //deepFreeze(newState);
+  deepFreeze(newState);
   return newState;
 }
 
@@ -229,7 +216,7 @@ function saveState(state) {
 
     sessionStorage.setItem(STATE_KEY, json);
   } catch (e) {
-    error(e.message);
+    handleError(e.message);
   }
 }
 
@@ -280,11 +267,9 @@ export interface PropToPathMap {
 @Injectable()
 export class StateService {
   constructor(private state: State<Object>, private store: Store<Object>) {
-      this.store.subscribe(
-        throttle(
-          () => saveState(this.getState()),
-          1000,
-          {leading: false}));
+    this.store.subscribe(
+      throttle(() => saveState(this.getState()), 1000, {leading: false})
+    );
   }
 
   addReducer(type: string, fn: ReducerFn): void {
@@ -299,8 +284,8 @@ export class StateService {
   }
 
   /**
-  * This deletes the property at path.
-  */
+   * This deletes the property at path.
+   */
   dispatchDelete(path) {
     this.dispatch(DELETE + ' ' + path, path);
   }
@@ -311,9 +296,13 @@ export class StateService {
    * and returns a boolean indicating
    * whether the element should be retained.
    */
-  dispatchFilter(path: string, filterFn): void {
+  dispatchFilter<T>(
+    path: string,
+    sampleValue: T,
+    filterFn: (value: T) => boolean
+  ): void {
     if (typeof filterFn !== 'function') {
-      error('dispatchFilter must be passed a function');
+      handleError('dispatchFilter must be passed a function');
     }
 
     this.dispatch(FILTER + ' ' + path, {path, value: filterFn});
@@ -324,7 +313,7 @@ export class StateService {
    * mapFn must be a function that takes an array element
    * and returns new value for the element.
    */
-  dispatchMap(path: string, mapFn): void {
+  dispatchMap<T>(path: string, sampleValue: T, mapFn: (value: T) => T): void {
     if (typeof mapFn !== 'function') {
       throw new Error('dispatchMap must be passed a function');
     }
@@ -335,7 +324,7 @@ export class StateService {
   /**
    * This adds elements to the end of the array at path.
    */
-  dispatchPush(path, ...elements): void {
+  dispatchPush<T>(path, sampleValue: T, ...elements: T[]): void {
     this.dispatch(PUSH + ' ' + path, {path, value: elements});
   }
 
@@ -343,11 +332,11 @@ export class StateService {
    * Dispatches a Redux action that sets
    * the value found at path to a given value.
    */
-  dispatchSet(path: string, value: any): void {
+  dispatchSet<T>(path: string, sampleValue: T, value: T): void {
     this.dispatch(SET + ' ' + path, {path, value});
   }
 
-  dispatchTransform(path: string, value: TransformFn) {
+  dispatchTransform<T>(path: string, sampleValue: T, value: (value: T) => T) {
     this.dispatch(TRANSFORM + ' ' + path, {path, value});
   }
 
@@ -365,6 +354,12 @@ export class StateService {
 
   getState(): Object {
     return this.state.getValue();
+  }
+
+  handleAsyncAction(promise) {
+    promise
+      .then(newState => this.dispatch('@@async', newState))
+      .catch(handleError);
   }
 
   setInitialState(state): void {

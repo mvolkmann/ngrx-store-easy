@@ -46,7 +46,7 @@ export class InputComponent implements OnInit {
       if (value.length) v = Number(value);
     }
 
-    this.stateSvc.dispatchSet(path, v);
+    this.stateSvc.dispatchSet(path, '', v);
 
     //TODO: Support custom change handling.
     //if (onChange) onChange(event);
