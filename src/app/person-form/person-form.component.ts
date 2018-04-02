@@ -1,6 +1,9 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component
+} from '@angular/core';
 
-import {AppState} from '../../model';
 import {StateService} from '../../nse/state.service';
 import {TextPath} from '../../nse/checkboxes.component';
 import {TextValue} from '../../nse/radio-buttons.component';
@@ -25,24 +28,8 @@ export class PersonFormComponent {
     {text: 'Reverse', value: 3}
   ];
 
-  constructor(
-    public cd: ChangeDetectorRef,
-    private stateSvc: StateService
-  ) {
+  constructor(public cd: ChangeDetectorRef, private stateSvc: StateService) {
     stateSvc.watch(this, {colors: 'person.colors'});
-
-    // Just an example of writing a custom reducer function.
-    stateSvc.addReducer('shout', (state: AppState) => {
-      const {person} = state;
-      const {name} = person;
-      return {
-        ...state,
-        person: {
-          ...person,
-          name: name.toUpperCase()
-        }
-      };
-    });
   }
 
   addColor() {

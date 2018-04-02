@@ -376,10 +376,7 @@ export class StateService {
 
   subscribe(path, callback): void {
     // Get an observable to the path within the state.
-    // This works.  Components looking at the same path do get updated.
     const obs$ = this.store.select(state => this.getPathValue(path, state));
-    // This does not work.  Components looking at the same path don't get updated.
-    //const obs$ = this.store.pipe(select(path));
 
     obs$.subscribe(value => callback(value));
   }
@@ -388,12 +385,10 @@ export class StateService {
     Object.keys(propToPathMap).forEach(prop => {
       // Path defaults to same as prop if not set.
       const path = propToPathMap[prop] || prop;
-      //this.subscribe(path, v => (obj[prop] = v));
       this.subscribe(path, v => {
-        console.log('state.service.ts watch:', prop, 'changed to', v, 'in', obj);
         obj[prop] = v;
         const cd = obj['cd'];
-        console.log('state.service.ts watch: cd =', cd);
+        //if (cd) cd.detectChanges();
         if (cd) cd.markForCheck();
       });
     });

@@ -1,17 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { HelloDisplayComponent } from './hello-display.component';
+import {HelloDisplayComponent} from './hello-display.component';
 
 describe('HelloDisplayComponent', () => {
   let component: HelloDisplayComponent;
   let fixture: ComponentFixture<HelloDisplayComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ HelloDisplayComponent ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        declarations: [HelloDisplayComponent]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(HelloDisplayComponent);

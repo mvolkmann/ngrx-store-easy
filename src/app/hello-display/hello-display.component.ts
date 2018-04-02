@@ -1,4 +1,8 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component
+} from '@angular/core';
 
 import {StateService} from '../../nse/state.service';
 
@@ -16,10 +20,7 @@ import {StateService} from '../../nse/state.service';
 export class HelloDisplayComponent {
   person = {};
 
-  constructor(
-    public cd: ChangeDetectorRef,
-    private stateSvc: StateService
-  ) {
+  constructor(public cd: ChangeDetectorRef, private stateSvc: StateService) {
     stateSvc.watch(this, {person: ''});
   }
 }
