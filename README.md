@@ -101,7 +101,7 @@ import {dispatch, watch} from 'ngrx-store-easy';
     // If the setFirstName action just sets a value in the state,
     // perhaps user.firstName, the following can be used instead.
     // There is no need to implement simple reducer functions.
-    dispatchSet('user.firstName', value);
+    dispatchSet('user.firstName', '', value);
 ```
 
 In components that need to render data from the state,
@@ -202,7 +202,7 @@ const checkboxList = [
 When a checkbox is clicked the boolean value at the corresponding path
 will be toggled between false and true.
 
-## Asynchronous Actions (coming soon)
+## Asynchronous Actions
 
 If a function passed to `addReducer` returns a `Promise`
 and a matching action is dispatched,
