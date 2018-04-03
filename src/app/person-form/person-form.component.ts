@@ -3,7 +3,10 @@ import {
   ChangeDetectorRef,
   Component
 } from '@angular/core';
+import {Store} from '@ngrx/store';
+import {Observable} from 'rxjs/observable';
 
+import {AppState} from '../../model';
 import {HasChangeDetector, StateService} from '../../nse/state.service';
 import {TextPath} from '../../nse/checkboxes.component';
 import {TextValue} from '../../nse/radio-buttons.component';
@@ -20,7 +23,7 @@ export class PersonFormComponent extends HasChangeDetector {
     {text: 'Evening', path: 'person.evening'}
   ];
 
-  colors: string[] = [];
+  colors$: Observable<string[]>;
 
   directionList: TextValue[] = [
     {text: 'Forward', value: 1},
@@ -28,17 +31,23 @@ export class PersonFormComponent extends HasChangeDetector {
     {text: 'Reverse', value: 3}
   ];
 
-  constructor(cd: ChangeDetectorRef, private stateSvc: StateService) {
+  constructor(
+    cd: ChangeDetectorRef,
+    private stateSvc: StateService,
+    store: Store<AppState>
+  ) {
     super(cd);
-    stateSvc.watch(this, {colors: 'person.colors'});
+    this.colors$ = store.select('person', 'colors');
   }
 
   addColor() {
-    const color = this.stateSvc.getPathValue('newColor');
-    if (!this.colors || !this.colors.includes(color)) {
-      this.stateSvc.dispatchPush('person.colors', '', color);
+    const {stateSvc} = this;
+    const color = stateSvc.getPathValue('newColor');
+    const colors = stateSvc.getPathValue('person.colors');
+    if (!colors.includes(color)) {
+      stateSvc.dispatchPush('person.colors', '', color);
     }
-    this.stateSvc.dispatchSet('newColor', '', '');
+    stateSvc.dispatchSet('newColor', '', '');
   }
 
   deleteColor(color: string) {

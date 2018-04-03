@@ -50,7 +50,7 @@
   <label>Colors</label>
   <nse-input path="newColor" (enter)="addColor()"></nse-input>
   <button (click)="addColor()">&#xFF0B;</button>
-  <div class="color-line" *ngFor="let color of colors">
+  <div class="color-line" *ngFor="let color of colors$ | async">
     {{color}}
     <button (click)="deleteColor(color)">&#x2715;</button>
   </div>

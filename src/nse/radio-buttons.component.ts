@@ -1,4 +1,5 @@
 import {Component, Input, OnInit, Output} from '@angular/core';
+import {Store} from '@ngrx/store';
 
 import {StateService} from './state.service';
 
@@ -37,10 +38,10 @@ export class RadioButtonsComponent implements OnInit {
   @Input() path = '';
   @Input() value = 0;
 
-  constructor(private stateSvc: StateService) {}
+  constructor(private stateSvc: StateService, private store: Store<any>) {}
 
   ngOnInit() {
-    this.stateSvc.watch(this, {value: this.path});
+    this.stateSvc.watch(this.path, this, 'value');
   }
 
   getName(index) {

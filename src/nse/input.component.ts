@@ -1,4 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Store} from '@ngrx/store';
 
 import {StateService} from './state.service';
 
@@ -25,10 +26,10 @@ export class InputComponent implements OnInit {
   @Output() enter = new EventEmitter();
   @Output() value = '';
 
-  constructor(private stateSvc: StateService) {}
+  constructor(private stateSvc: StateService, private store: Store<any>) {}
 
   ngOnInit() {
-    this.stateSvc.watch(this, {value: this.path});
+    this.stateSvc.watch(this.path, this, 'value');
     if (this.type === 'checkbox') {
       this.checked = Boolean(this.value);
     }

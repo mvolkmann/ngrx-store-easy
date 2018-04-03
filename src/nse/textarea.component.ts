@@ -1,4 +1,5 @@
 import {Component, Input, OnInit, Output} from '@angular/core';
+import {Store} from '@ngrx/store';
 
 import {StateService} from './state.service';
 
@@ -17,10 +18,10 @@ export class TextAreaComponent implements OnInit {
   @Input() path: string;
   @Output() value = '';
 
-  constructor(private stateSvc: StateService) {}
+  constructor(private stateSvc: StateService, private store: Store<any>) {}
 
   ngOnInit() {
-    this.stateSvc.watch(this, {value: this.path});
+    this.stateSvc.watch(this.path, this, 'value');
   }
 
   onChange(event) {

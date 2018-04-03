@@ -376,19 +376,11 @@ export class StateService {
     obs$.subscribe(value => callback(value));
   }
 
-  watch(obj: Object, propToPathMap: PropToPathMap): void {
-    Object.keys(propToPathMap).forEach(prop => {
-      // Path defaults to same as prop if not set.
-      const path = propToPathMap[prop] || prop;
-      this.subscribe(path, v => {
-        obj[prop] = v;
-        /*
-        const cd = obj['cd'];
-        if (cd) cd.markForCheck();
-        */
-        if (obj instanceof HasChangeDetector) obj.markForCheck();
-      });
-    });
+  watch(path, obj, property) {
+    const {store} = this;
+    const parts = path.split('.');
+    const obs$ = store.select.apply(store, parts);
+    obs$.subscribe(value => obj[property] = value);
   }
 }
 
@@ -401,7 +393,7 @@ export class StateService {
  * export class Demo extends HasChangeDetector {
  *   constructor(cd: ChangeDetectorRef, private stateSvc: StateService) {
  *     super(cd);
- *     stateSvc.watch(this, {color: 'car.color'});
+ *     ...
  *   }
  * }
  */
