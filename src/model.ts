@@ -1,5 +1,3 @@
-import {Action} from '@ngrx/store';
-
 export interface Person {
   age: number;
   colors: string[];
