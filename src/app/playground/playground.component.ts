@@ -18,7 +18,6 @@ export class PlaygroundComponent {
   name$: Observable<string>;
 
   constructor(private store: Store<AppState>) {
-    // Demonstates an approach that doesn't use stateSvc.watch
     this.age$ = store.select('person', 'age');
     this.name$ = store.select('person', 'name');
   }
