@@ -13,6 +13,8 @@ import {AppState} from '../../model';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+// This doesn't need to extend HasChangeDetector
+// because it only watches primitive properties.
 export class PlaygroundComponent {
   age$: Observable<number>;
   name$: Observable<string>;

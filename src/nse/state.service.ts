@@ -2,6 +2,13 @@ import {ChangeDetectorRef, Injectable} from '@angular/core';
 import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
 import {throttle} from 'lodash/function';
 import {Observable} from 'rxjs/Observable';
+import {Subscription} from 'rxjs/Subscription';
+
+interface Action {
+  type: string;
+  payload?: any;
+}
+type StateType = Object;
 
 const DELETE = '@@delete';
 const FILTER = '@@filter';
@@ -35,7 +42,7 @@ export function getReducer() {
 }
 export const metaReducers = [getReducer];
 
-export type ReducerFn = (state: Object, payload?: any) => Object;
+export type ReducerFn = (state: StateType, payload?: any) => StateType;
 
 function deepFreeze(obj: Object, freezing: Object[] = []): void {
   //TODO: When running "npm run package" it complains
@@ -55,7 +62,7 @@ function deepFreeze(obj: Object, freezing: Object[] = []): void {
   Object.freeze(obj);
 }
 
-function deletePath(state, payload): void {
+function deletePath(state: StateType, payload: any): StateType {
   const path = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -74,7 +81,7 @@ function deletePath(state, payload): void {
   return newState;
 }
 
-function filterPath(state, payload): void {
+function filterPath(state: StateType, payload: any): StateType {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -105,7 +112,7 @@ function handleError(message: string): void {
   //throw new Error(err);
 }
 
-function initState(state: Object, payload: Object): Object {
+function initState(state: StateType, payload: StateType): StateType {
   return payload;
 }
 
@@ -113,7 +120,7 @@ function initState(state: Object, payload: Object): Object {
  * This is called on app startup and
  * again each time the browser window is refreshed.
  */
-export function loadState(): Object {
+export function loadState(): StateType {
   const {sessionStorage} = window; // not available in tests
 
   try {
@@ -125,7 +132,7 @@ export function loadState(): Object {
   }
 }
 
-function mapPath(state, payload): Object {
+function mapPath(state: StateType, payload: any): StateType {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -152,7 +159,7 @@ function mapPath(state, payload): Object {
   return newState;
 }
 
-function pushPath(state, payload): Object {
+function pushPath(state: StateType, payload: any): StateType {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -174,7 +181,10 @@ function pushPath(state, payload): Object {
   return newState;
 }
 
-export function reducer(state = initialState, action): Object {
+export function reducer(
+  state: StateType = initialState,
+  action: Action
+): StateType {
   let {type} = action;
   if (!type) {
     handleError('action object passed to reducer must have type property');
@@ -207,21 +217,16 @@ export function reducer(state = initialState, action): Object {
   return newState;
 }
 
-function saveState(state): void {
+function saveState(state: StateType): void {
   try {
-    // When stringifying errors Set, change to an Array.
-    const json = JSON.stringify(
-      state,
-      (key, value) => (key === 'errors' ? [...state.errors] : value)
-    );
-
+    const json = JSON.stringify(state);
     sessionStorage.setItem(STATE_KEY, json);
   } catch (e) {
     handleError(e.message);
   }
 }
 
-function setPath(state, payload): Object {
+function setPath(state: StateType, payload: any): StateType {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -240,7 +245,7 @@ function setPath(state, payload): Object {
   return newState;
 }
 
-function transformPath(state, payload): Object {
+function transformPath(state: StateType, payload: any): StateType {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -263,7 +268,12 @@ function transformPath(state, payload): Object {
 
 @Injectable()
 export class StateService {
-  constructor(private state: State<Object>, private store: Store<Object>) {
+  initialState = {};
+
+  constructor(
+    private state: State<StateType>,
+    private store: Store<StateType>
+  ) {
     this.store.subscribe(
       throttle(() => saveState(this.getState()), 1000, {leading: false})
     );
@@ -333,6 +343,10 @@ export class StateService {
     this.dispatch(TRANSFORM + ' ' + path, {path, value});
   }
 
+  getInitialValue(path: string): any {
+    return this.getPathValue(path, initialState);
+  }
+
   getObservable(path): Observable<any> {
     const {store} = this;
     const parts = path.split('.');
@@ -351,7 +365,7 @@ export class StateService {
     return value;
   }
 
-  getState(): Object {
+  getState(): StateType {
     return this.state.getValue();
   }
 
@@ -361,15 +375,15 @@ export class StateService {
       .catch(handleError);
   }
 
-  setInitialState(state): void {
+  setInitialState(state: StateType): void {
     const sessionState = loadState();
     const haveSession = sessionState && Object.keys(sessionState).length > 0;
     initialState = haveSession ? sessionState : state;
     this.dispatch(INIT, initialState);
   }
 
-  watch(path, obj, property): void {
-    this.getObservable(path).subscribe(value => {
+  watch(path: string, obj: Object, property: string): Subscription {
+    return this.getObservable(path).subscribe(value => {
       obj[property] = value;
       if (obj instanceof HasChangeDetector) obj.markForCheck();
     });

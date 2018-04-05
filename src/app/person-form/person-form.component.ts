@@ -47,18 +47,29 @@ export class PersonFormComponent extends HasChangeDetector {
     if (!colors.includes(color)) {
       stateSvc.dispatchPush('person.colors', '', color);
     }
-    stateSvc.dispatchSet('newColor', '', '');
+    const path = 'newColor';
+    const initial = stateSvc.getInitialValue(path);
+    stateSvc.dispatchSet(path, initial, '');
   }
 
   deleteColor(color: string) {
-    this.stateSvc.dispatchFilter('person.colors', '', c => c !== color);
+    const {stateSvc} = this;
+    const path = 'person.colors';
+    const initial = stateSvc.getInitialValue(path);
+    stateSvc.dispatchFilter(path, initial, c => c !== color);
   }
 
   pickEvening() {
-    this.stateSvc.dispatchSet('person.evening', true, true);
+    const {stateSvc} = this;
+    const path = 'person.evening';
+    const initial = stateSvc.getInitialValue(path);
+    this.stateSvc.dispatchSet(path, initial, true);
   }
 
   pickIdle() {
-    this.stateSvc.dispatchSet('person.direction', '', '2');
+    const {stateSvc} = this;
+    const path = 'person.direction';
+    const initial = stateSvc.getInitialValue(path);
+    stateSvc.dispatchSet(path, initial, '2');
   }
 }
