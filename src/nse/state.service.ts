@@ -37,7 +37,7 @@ export const metaReducers = [getReducer];
 
 export type ReducerFn = (state: Object, payload?: any) => Object;
 
-function deepFreeze(obj: Object, freezing: Object[] = []) {
+function deepFreeze(obj: Object, freezing: Object[] = []): void {
   //TODO: When running "npm run package" it complains
   //TODO: that includes does not exist on Object[].  Wha?
   if (Object.isFrozen(obj) || freezing.includes(obj)) return;
@@ -55,7 +55,7 @@ function deepFreeze(obj: Object, freezing: Object[] = []) {
   Object.freeze(obj);
 }
 
-function deletePath(state, payload) {
+function deletePath(state, payload): void {
   const path = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -74,7 +74,7 @@ function deletePath(state, payload) {
   return newState;
 }
 
-function filterPath(state, payload) {
+function filterPath(state, payload): void {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -99,13 +99,13 @@ function filterPath(state, payload) {
   return newState;
 }
 
-function handleError(message: string) {
+function handleError(message: string): void {
   const err = 'ngrx-store-easy error: ' + message;
   console.error(err);
   //throw new Error(err);
 }
 
-function initState(state, payload) {
+function initState(state: Object, payload: Object): Object {
   return payload;
 }
 
@@ -113,7 +113,7 @@ function initState(state, payload) {
  * This is called on app startup and
  * again each time the browser window is refreshed.
  */
-export function loadState() {
+export function loadState(): Object {
   const {sessionStorage} = window; // not available in tests
 
   try {
@@ -125,7 +125,7 @@ export function loadState() {
   }
 }
 
-function mapPath(state, payload) {
+function mapPath(state, payload): Object {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -152,7 +152,7 @@ function mapPath(state, payload) {
   return newState;
 }
 
-function pushPath(state, payload) {
+function pushPath(state, payload): Object {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -174,7 +174,7 @@ function pushPath(state, payload) {
   return newState;
 }
 
-export function reducer(state = initialState, action) {
+export function reducer(state = initialState, action): Object {
   let {type} = action;
   if (!type) {
     handleError('action object passed to reducer must have type property');
@@ -207,7 +207,7 @@ export function reducer(state = initialState, action) {
   return newState;
 }
 
-function saveState(state) {
+function saveState(state): void {
   try {
     // When stringifying errors Set, change to an Array.
     const json = JSON.stringify(
@@ -221,7 +221,7 @@ function saveState(state) {
   }
 }
 
-function setPath(state, payload) {
+function setPath(state, payload): Object {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -240,7 +240,7 @@ function setPath(state, payload) {
   return newState;
 }
 
-function transformPath(state, payload) {
+function transformPath(state, payload): Object {
   const {path, value} = payload;
   const parts = path.split(PATH_DELIMITER);
   const lastPart = parts.pop();
@@ -283,7 +283,7 @@ export class StateService {
   /**
    * This deletes the property at path.
    */
-  dispatchDelete(path) {
+  dispatchDelete(path): void {
     this.dispatch(DELETE + ' ' + path, path);
   }
 
@@ -325,7 +325,11 @@ export class StateService {
     this.dispatch(SET + ' ' + path, {path, value});
   }
 
-  dispatchTransform<T>(path: string, sampleValue: T, value: (value: T) => T) {
+  dispatchTransform<T>(
+    path: string,
+    sampleValue: T,
+    value: (value: T) => T
+  ): void {
     this.dispatch(TRANSFORM + ' ' + path, {path, value});
   }
 
@@ -351,7 +355,7 @@ export class StateService {
     return this.state.getValue();
   }
 
-  handleAsyncAction(promise) {
+  handleAsyncAction(promise): void {
     promise
       .then(newState => this.dispatch('@@async', newState))
       .catch(handleError);
@@ -364,7 +368,7 @@ export class StateService {
     this.dispatch(INIT, initialState);
   }
 
-  watch(path, obj, property) {
+  watch(path, obj, property): void {
     this.getObservable(path).subscribe(value => {
       obj[property] = value;
       if (obj instanceof HasChangeDetector) obj.markForCheck();
@@ -388,7 +392,7 @@ export class StateService {
 export class HasChangeDetector {
   constructor(private cd: ChangeDetectorRef) {}
 
-  markForCheck() {
+  markForCheck(): void {
     this.cd.markForCheck();
   }
 }
