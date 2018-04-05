@@ -343,10 +343,6 @@ export class StateService {
     this.dispatch(TRANSFORM + ' ' + path, {path, value});
   }
 
-  getInitialValue(path: string): any {
-    return this.getPathValue(path, initialState);
-  }
-
   getObservable(path): Observable<any> {
     const {store} = this;
     const parts = path.split('.');
@@ -373,6 +369,10 @@ export class StateService {
     promise
       .then(newState => this.dispatch('@@async', newState))
       .catch(handleError);
+  }
+
+  initial(path: string): any {
+    return this.getPathValue(path, initialState);
   }
 
   setInitialState(state: StateType): void {

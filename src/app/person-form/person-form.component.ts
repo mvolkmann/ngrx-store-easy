@@ -11,6 +11,9 @@ import {HasChangeDetector, StateService} from '../../nse/state.service';
 import {TextPath} from '../../nse/checkboxes.component';
 import {TextValue} from '../../nse/radio-buttons.component';
 
+let stateSvc;
+let initial;
+
 @Component({
   selector: 'app-person-form',
   templateUrl: './person-form.component.html',
@@ -31,45 +34,35 @@ export class PersonFormComponent extends HasChangeDetector {
     {text: 'Reverse', value: 3}
   ];
 
-  constructor(
-    cd: ChangeDetectorRef,
-    private stateSvc: StateService,
-    store: Store<AppState>
-  ) {
+  constructor(cd: ChangeDetectorRef, ss: StateService, store: Store<AppState>) {
     super(cd);
+    stateSvc = ss;
+    initial = stateSvc.initial.bind(stateSvc);
     this.colors$ = store.select('person', 'colors');
   }
 
   addColor() {
-    const {stateSvc} = this;
     const color = stateSvc.getPathValue('newColor');
     const colors = stateSvc.getPathValue('person.colors');
     if (!colors.includes(color)) {
-      stateSvc.dispatchPush('person.colors', '', color);
+      stateSvc.dispatchPush('person.colors', initial('newColor'), color);
     }
     const path = 'newColor';
-    const initial = stateSvc.getInitialValue(path);
-    stateSvc.dispatchSet(path, initial, '');
+    stateSvc.dispatchSet(path, initial(path), '');
   }
 
   deleteColor(color: string) {
-    const {stateSvc} = this;
     const path = 'person.colors';
-    const initial = stateSvc.getInitialValue(path);
-    stateSvc.dispatchFilter(path, initial, c => c !== color);
+    stateSvc.dispatchFilter(path, initial(path), c => c !== color);
   }
 
   pickEvening() {
-    const {stateSvc} = this;
     const path = 'person.evening';
-    const initial = stateSvc.getInitialValue(path);
-    this.stateSvc.dispatchSet(path, initial, true);
+    stateSvc.dispatchSet(path, initial(path), true);
   }
 
   pickIdle() {
-    const {stateSvc} = this;
     const path = 'person.direction';
-    const initial = stateSvc.getInitialValue(path);
-    stateSvc.dispatchSet(path, initial, '2');
+    stateSvc.dispatchSet(path, initial(path), '2');
   }
 }

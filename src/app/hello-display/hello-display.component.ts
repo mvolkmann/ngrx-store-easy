@@ -1,4 +1,4 @@
-import {Store} from '@ngrx/store';
+import {createSelector, Store} from '@ngrx/store';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -28,13 +28,28 @@ export class HelloDisplayComponent extends HasChangeDetector
   person: Person;
   subscription: Subscription;
 
-  constructor(cd: ChangeDetectorRef, stateSvc: StateService) {
+  constructor(
+    cd: ChangeDetectorRef,
+    stateSvc: StateService,
+    store: Store<AppState>
+  ) {
     super(cd);
+
     this.subscription = stateSvc.watch('person', this, 'person');
+
+    /*
+    const getPerson = (state: AppState) => state.person;
+    const selector = createSelector(getPerson, person => person);
+    this.subscription = store
+      .select(selector)
+      .subscribe(person => {
+        this.person = person;
+        cd.markForCheck();
+      });
+    */
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 }
-
