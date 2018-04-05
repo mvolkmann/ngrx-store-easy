@@ -1,4 +1,8 @@
-import {Component} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component
+} from '@angular/core';
 import {StateService} from '../nse/state.service';
 
 import {initialState} from '../initial-state';
@@ -10,7 +14,8 @@ import {initialState} from '../initial-state';
     <app-hello-display></app-hello-display>
     <app-playground></app-playground>
   `,
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   constructor(private stateSvc: StateService) {
