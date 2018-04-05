@@ -1,4 +1,12 @@
-import {Component, Input, NgModule, OnInit, Output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  NgModule,
+  OnInit,
+  Output
+} from '@angular/core';
 
 import {StateService} from './state.service';
 
@@ -27,18 +35,22 @@ export interface TextPath {
         <label>{{obj.text}}</label>
       </div>
     </div>
-  `
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckboxesComponent implements OnInit {
   @Input() className = '';
   @Input() list: TextPath[];
   @Input() values = [];
 
-  constructor(private stateSvc: StateService) {}
+  constructor(private cd: ChangeDetectorRef, private stateSvc: StateService) {}
 
   ngOnInit() {
     this.list.forEach((obj, index) =>
-      this.stateSvc.subscribe(obj.path, value => (this.values[index] = value))
+      this.stateSvc.subscribe(obj.path, value => {
+        this.values[index] = value;
+        this.cd.markForCheck();
+      })
     );
   }
 

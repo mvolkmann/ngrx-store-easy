@@ -380,7 +380,11 @@ export class StateService {
     const {store} = this;
     const parts = path.split('.');
     const obs$ = store.select.apply(store, parts);
-    obs$.subscribe(value => obj[property] = value);
+    obs$.subscribe(value => {
+      obj[property] = value;
+      if (obj instanceof HasChangeDetector) obj.markForCheck();
+
+    });
   }
 }
 

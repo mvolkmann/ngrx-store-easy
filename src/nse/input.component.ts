@@ -1,7 +1,14 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Store} from '@ngrx/store';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output
+} from '@angular/core';
 
-import {StateService} from './state.service';
+import {HasChangeDetector, StateService} from './state.service';
 
 @Component({
   selector: 'nse-input',
@@ -15,9 +22,10 @@ import {StateService} from './state.service';
       (keypress)="onKeyPress($event)"
       (keyup)="onChange($event)"
     >
-  `
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InputComponent implements OnInit {
+export class InputComponent extends HasChangeDetector implements OnInit {
   @Input() autofocus: boolean;
   @Input() path: string;
   @Input() type = 'text';
@@ -26,7 +34,9 @@ export class InputComponent implements OnInit {
   @Output() enter = new EventEmitter();
   @Output() value = '';
 
-  constructor(private stateSvc: StateService, private store: Store<any>) {}
+  constructor(cd: ChangeDetectorRef, private stateSvc: StateService) {
+    super(cd);
+  }
 
   ngOnInit() {
     this.stateSvc.watch(this.path, this, 'value');
