@@ -47,7 +47,7 @@ export class CheckboxesComponent implements OnInit {
 
   ngOnInit() {
     this.list.forEach((obj, index) =>
-      this.stateSvc.subscribe(obj.path, value => {
+      this.stateSvc.getObservable(obj.path).subscribe(value => {
         this.values[index] = value;
         this.cd.markForCheck();
       })

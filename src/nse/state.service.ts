@@ -1,6 +1,7 @@
 import {ChangeDetectorRef, Injectable} from '@angular/core';
 import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
 import {throttle} from 'lodash/function';
+import {Observable} from 'rxjs/Observable';
 
 const DELETE = '@@delete';
 const FILTER = '@@filter';
@@ -260,10 +261,6 @@ function transformPath(state, payload) {
   return newState;
 }
 
-export interface PropToPathMap {
-  [prop: string]: string;
-}
-
 @Injectable()
 export class StateService {
   constructor(private state: State<Object>, private store: Store<Object>) {
@@ -301,10 +298,6 @@ export class StateService {
     sampleValue: T,
     filterFn: (value: T) => boolean
   ): void {
-    if (typeof filterFn !== 'function') {
-      handleError('dispatchFilter must be passed a function');
-    }
-
     this.dispatch(FILTER + ' ' + path, {path, value: filterFn});
   }
 
@@ -314,10 +307,6 @@ export class StateService {
    * and returns new value for the element.
    */
   dispatchMap<T>(path: string, sampleValue: T, mapFn: (value: T) => T): void {
-    if (typeof mapFn !== 'function') {
-      throw new Error('dispatchMap must be passed a function');
-    }
-
     this.dispatch(MAP + ' ' + path, {path, value: mapFn});
   }
 
@@ -338,6 +327,12 @@ export class StateService {
 
   dispatchTransform<T>(path: string, sampleValue: T, value: (value: T) => T) {
     this.dispatch(TRANSFORM + ' ' + path, {path, value});
+  }
+
+  getObservable(path): Observable<any> {
+    const {store} = this;
+    const parts = path.split('.');
+    return store.select.apply(store, parts);
   }
 
   getPathValue(path: string, state?: Object): any {
@@ -369,21 +364,10 @@ export class StateService {
     this.dispatch(INIT, initialState);
   }
 
-  subscribe(path, callback): void {
-    // Get an observable to the path within the state.
-    const obs$ = this.store.select(state => this.getPathValue(path, state));
-
-    obs$.subscribe(value => callback(value));
-  }
-
   watch(path, obj, property) {
-    const {store} = this;
-    const parts = path.split('.');
-    const obs$ = store.select.apply(store, parts);
-    obs$.subscribe(value => {
+    this.getObservable(path).subscribe(value => {
       obj[property] = value;
       if (obj instanceof HasChangeDetector) obj.markForCheck();
-
     });
   }
 }
