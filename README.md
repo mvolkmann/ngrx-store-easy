@@ -6,7 +6,9 @@ Angular applications that use ngrx/store to manage state.
 ## Benefits
 
 * No string constants are needed for action types.
-* Reducer functions that switch on action type are not needed.
+* A reducer function that switches on action type is not needed.
+* The dispatch function is accessed through a simple import rather than
+  using the react-redux `connect` and `mapDispatchToProps` functions.
 * Actions can be dispatched by providing just a type and payload
   rather than an action object.
 * Each action type is handled by a single reducer function
@@ -14,6 +16,12 @@ Angular applications that use ngrx/store to manage state.
 * Simple actions that merely set a property value in the state
   (the most common kind) can be dispatched without writing
   reducer functions (see `dispatchSet`).
+* Actions that modify a property based on its current value
+  can be dispatched without writing reducer functions
+  (see `dispatchTransform`).
+* Actions that only delete a property
+  can be dispatched without writing reducer functions
+  (see `dispatchDelete`).
 * Actions that only add elements to the end of an array
   can be dispatched without writing reducer functions
   (see `dispatchPush`).
@@ -26,7 +34,7 @@ Angular applications that use ngrx/store to manage state.
 * All objects in the Redux state are automatically frozen
   to prevent accidental state modification.
 * Asynchronous actions are handled in a simple way
-  without requiring middleware or thunks (coming soon).
+  without requiring middleware or thunks.
 * The complexity of nested/combined reducers can be bypassed.
 * Redux state is automatically saved in `sessionStorage`
   (on every state change, but limited to once per second).
@@ -36,17 +44,14 @@ Angular applications that use ngrx/store to manage state.
 
 ## Example app
 
-See https://github.com/mvolkmann/angular-form-demo.
+See the `app` directory here.
 
 ## Setup
 
 In `app.module.ts`, add the following imports:
 
 ```js
-import {getDeclarations, getImports, StateService} from './state.service';
-import {ReduxCheckboxesComponent} from './nse-checkboxes.component';
-import {ReduxInputComponent} from './nse-input.component';
-import {ReduxRadioButtonsComponent} from './nse-radio-buttons.component';
+import {NseModule} from '../nse/nse.module';
 ```
 
 Add the following to the `declarations` array:
@@ -58,25 +63,21 @@ NseSelectComponent,
 NseTextAreaComponent,
 ```
 
-Add the following to the `imports` array:
-```js
-...getImports(environment),
-```
-
-Add `StateProvider` to the `providers` array.
+Add NseModule following to the `imports` array.
 
 If custom reducers are needed, define them
 like the following example in any source files
 that are loaded before the action is dispatched:
 
 ```js
-import {addReducer} from 'ngrx-store-easy';
+import {StateSvc} from 'ngrx-store-easy';
+// Inject StateSvc.
 
 // Call addReducer once for each action type, giving it the
 // function to be invoked when that action type is dispatched.
 // These functions must return the new state
 // and cannot modify the existing state.
-addReducer('addToAge', (state, years) => {
+stateSvc.addReducer('addToAge', (state, years) => {
   const {user} = state;
   return {
     ...state,
@@ -92,37 +93,32 @@ In components that need to dispatch actions,
 do something like the following:
 
 ```js
-import {dispatch, watch} from 'ngrx-store-easy';
+import {StateService} from 'ngrx-store-easy';
+// Inject StateSvc.
 ...
     // This assumes that addReducer was called earlier to define
     // a reducer function for the action type "setFirstName".
-    dispatch('setFirstName', firstName);
+    stateSvc.dispatch('setFirstName', firstName);
 
     // If the setFirstName action just sets a value in the state,
     // perhaps user.firstName, the following can be used instead.
     // There is no need to implement simple reducer functions.
-    dispatchSet('user.firstName', '', value);
+    stateSvc.dispatchSet('user.firstName', firstNameType, value);
 ```
 
 In components that need to render data from the state,
 do something like the following:
 
 ```js
-import {dispatch, watch} from 'ngrx-store-easy';
+import {StateService} from 'ngrx-store-easy';
 ...
   constructor(private stateSvc: StateService) {
-    // The second argument to watch is a map
-    // from component properties to state paths
-    // where path parts are separated by periods.
-    // Those properties will be updated any time
-    // the state at the corresponding path changes.
-    stateSvc.watch(this, {colors: 'person.colors'});
+    // The first argument to watch is a state path.
+    // The last argument is the property name to be set
+    // on this object when the value at that path changes.
+    stateSvc.watch('person.colors', this, 'colors'});
   }
 ```
-
-When the value for a prop comes from a top-level state property
-with the same name, the path can be an empty string, null, or
-undefined and `watch` will use the prop name as the path.
 
 ## Form Elements Tied to State Paths
 
