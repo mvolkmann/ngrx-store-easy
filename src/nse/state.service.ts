@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Injectable} from '@angular/core';
-import {ActionReducerMap, State, Store, StoreModule, select} from '@ngrx/store';
+import {State, Store} from '@ngrx/store';
 import {throttle} from 'lodash/function';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
@@ -10,15 +10,15 @@ interface Action {
 }
 type StateType = Object;
 
-const DELETE = '@@delete';
-const FILTER = '@@filter';
-const INIT = '@@init';
-const MAP = '@@map';
-const PATH_DELIMITER = '.';
-const PUSH = '@@push';
-const SET = '@@set';
-const TRANSFORM = '@@transform';
-const STATE_KEY = 'reduxState';
+const DELETE: string = '@@delete';
+const FILTER: string = '@@filter';
+const INIT: string = '@@init';
+const MAP: string = '@@map';
+const PATH_DELIMITER: string = '.';
+const PUSH: string = '@@push';
+const SET: string = '@@set';
+const TRANSFORM: string = '@@transform';
+const STATE_KEY: string = 'reduxState';
 
 const reducers = {
   '@ngrx/store/init': () => null,
