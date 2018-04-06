@@ -39,6 +39,8 @@ export class HelloDisplayComponent extends HasChangeDetector
     this.subscription = stateSvc.watch('person', this, 'person');
 
     /*
+    // This is more type-safe than using stateSvc.watch,
+    // but it is way more verbose.
     const getPerson = (state: AppState) => state.person;
     const selector = createSelector(getPerson, person => person);
     this.subscription = store
