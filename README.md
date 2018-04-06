@@ -112,7 +112,7 @@ do something like the following:
 ```js
 import {StateService} from 'ngrx-store-easy';
 ...
-  constructor(private stateSvc: StateService) {
+  constructor(stateSvc: StateService) {
     // The first argument to watch is a state path.
     // The last argument is the property name to be set
     // on this object when the value at that path changes.

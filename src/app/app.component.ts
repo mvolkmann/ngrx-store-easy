@@ -19,7 +19,7 @@ import {StateService} from '../nse/state.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-  constructor(private stateSvc: StateService) {
+  constructor(stateSvc: StateService) {
     stateSvc.setInitialState(initialState);
   }
 }
