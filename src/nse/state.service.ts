@@ -35,6 +35,31 @@ const reducers = {
 
 let initialState = {};
 
+export class CaptureType<T> {
+  constructor(value: T) {}
+}
+
+/**
+ * Components that set changeDetection to ChangeDetectionStrategy.OnPush should
+ * 1) extend this class
+ * 2) inject ChangeDetectorRef into their constructor
+ * 3) pass it to super
+ * For example,
+ * export class Demo extends HasChangeDetector {
+ *   constructor(cd: ChangeDetectorRef, private stateSvc: StateService) {
+ *     super(cd);
+ *     ...
+ *   }
+ * }
+ */
+export class HasChangeDetector {
+  constructor(private cd: ChangeDetectorRef) {}
+
+  markForCheck(): void {
+    this.cd.markForCheck();
+  }
+}
+
 // ng-packagr doesn't allow use of an anonymous function here.
 //const metaReducers = [() => reducer];
 export function getReducer() {
@@ -305,7 +330,7 @@ export class StateService {
    */
   dispatchFilter<T>(
     path: string,
-    sampleValue: T,
+    type: CaptureType<T>,
     filterFn: (value: T) => boolean
   ): void {
     this.dispatch(FILTER + ' ' + path, {path, value: filterFn});
@@ -316,14 +341,18 @@ export class StateService {
    * mapFn must be a function that takes an array element
    * and returns new value for the element.
    */
-  dispatchMap<T>(path: string, sampleValue: T, mapFn: (value: T) => T): void {
+  dispatchMap<T>(
+    path: string,
+    type: CaptureType<T>,
+    mapFn: (value: T) => T
+  ): void {
     this.dispatch(MAP + ' ' + path, {path, value: mapFn});
   }
 
   /**
    * This adds elements to the end of the array at path.
    */
-  dispatchPush<T>(path, sampleValue: T, ...elements: T[]): void {
+  dispatchPush<T>(path, type: CaptureType<T>, ...elements: T[]): void {
     this.dispatch(PUSH + ' ' + path, {path, value: elements});
   }
 
@@ -331,13 +360,13 @@ export class StateService {
    * Dispatches a Redux action that sets
    * the value found at path to a given value.
    */
-  dispatchSet<T>(path: string, sampleValue: T, value: T): void {
+  dispatchSet<T>(path: string, type: CaptureType<T>, value: T): void {
     this.dispatch(SET + ' ' + path, {path, value});
   }
 
   dispatchTransform<T>(
     path: string,
-    sampleValue: T,
+    type: CaptureType<T>,
     value: (value: T) => T
   ): void {
     this.dispatch(TRANSFORM + ' ' + path, {path, value});
@@ -387,26 +416,5 @@ export class StateService {
       obj[property] = value;
       if (obj instanceof HasChangeDetector) obj.markForCheck();
     });
-  }
-}
-
-/**
- * Components that set changeDetection to ChangeDetectionStrategy.OnPush should
- * 1) extend this class
- * 2) inject ChangeDetectorRef into their constructor
- * 3) pass it to super
- * For example,
- * export class Demo extends HasChangeDetector {
- *   constructor(cd: ChangeDetectorRef, private stateSvc: StateService) {
- *     super(cd);
- *     ...
- *   }
- * }
- */
-export class HasChangeDetector {
-  constructor(private cd: ChangeDetectorRef) {}
-
-  markForCheck(): void {
-    this.cd.markForCheck();
   }
 }

@@ -1,8 +1,8 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {Store, select} from '@ngrx/store';
 import {Observable} from 'rxjs/Observable';
-import {AppState} from '../../model';
-import { StateService} from '../../nse/state.service';
+import {AppState} from '../model';
+import {StateService} from '../../nse/state.service';
 
 @Component({
   selector: 'app-playground',

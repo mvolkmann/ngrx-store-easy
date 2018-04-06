@@ -6,13 +6,21 @@ import {
 import {Store} from '@ngrx/store';
 import {Observable} from 'rxjs/observable';
 
-import {AppState} from '../../model';
-import {HasChangeDetector, StateService} from '../../nse/state.service';
+import {
+  ageType,
+  directionType,
+  eveningType,
+  morningType,
+  newColorType
+} from '../initial-state';
+import {AppState} from '../model';
+import {
+  CaptureType,
+  HasChangeDetector,
+  StateService
+} from '../../nse/state.service';
 import {TextPath} from '../../nse/checkboxes.component';
 import {TextValue} from '../../nse/radio-buttons.component';
-
-let stateSvc;
-let initial;
 
 @Component({
   selector: 'app-person-form',
@@ -34,35 +42,41 @@ export class PersonFormComponent extends HasChangeDetector {
     {text: 'Reverse', value: 3}
   ];
 
-  constructor(cd: ChangeDetectorRef, ss: StateService, store: Store<AppState>) {
+  constructor(
+    cd: ChangeDetectorRef,
+    private stateSvc: StateService,
+    store: Store<AppState>
+  ) {
     super(cd);
-    stateSvc = ss;
-    initial = stateSvc.initial.bind(stateSvc);
     this.colors$ = store.select('person', 'colors');
   }
 
   addColor() {
-    const color = stateSvc.getPathValue('newColor');
-    const colors = stateSvc.getPathValue('person.colors');
+    const color: string = this.stateSvc.getPathValue('newColor');
+    const colors: string[] = this.stateSvc.getPathValue('person.colors');
     if (!colors.includes(color)) {
-      stateSvc.dispatchPush('person.colors', initial('newColor'), color);
+      this.stateSvc.dispatchPush('person.colors', newColorType, color);
     }
     const path = 'newColor';
-    stateSvc.dispatchSet(path, initial(path), '');
+    this.stateSvc.dispatchSet(path, newColorType, '');
   }
 
   deleteColor(color: string) {
     const path = 'person.colors';
-    stateSvc.dispatchFilter(path, initial(path), c => c !== color);
+    this.stateSvc.dispatchFilter(
+      path,
+      directionType,
+      (c: string) => c !== color
+    );
   }
 
   pickEvening() {
     const path = 'person.evening';
-    stateSvc.dispatchSet(path, initial(path), true);
+    this.stateSvc.dispatchSet(path, eveningType, true);
   }
 
   pickIdle() {
     const path = 'person.direction';
-    stateSvc.dispatchSet(path, initial(path), '2');
+    this.stateSvc.dispatchSet(path, directionType, '2');
   }
 }

@@ -8,7 +8,8 @@ import {
 import {Observable} from 'rxjs/observable';
 import {Subscription} from 'rxjs/subscription';
 
-import {AppState, Person} from '../../model';
+import {AppState, Person} from '../model';
+import {ageType, personType} from '../initial-state';
 
 import {HasChangeDetector, StateService} from '../../nse/state.service';
 

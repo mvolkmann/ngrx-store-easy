@@ -3,9 +3,10 @@ import {
   ChangeDetectorRef,
   Component
 } from '@angular/core';
-import {StateService} from '../nse/state.service';
+import {createSelector} from '@ngrx/store';
 
-import {initialState} from '../initial-state';
+import {initialState} from './initial-state';
+import {StateService} from '../nse/state.service';
 
 @Component({
   selector: 'app-root',

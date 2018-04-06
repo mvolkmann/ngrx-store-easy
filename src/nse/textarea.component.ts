@@ -6,6 +6,7 @@ import {
   OnInit,
   Output
 } from '@angular/core';
+import {Selector} from '@ngrx/store';
 
 import {HasChangeDetector, StateService} from './state.service';
 
@@ -34,6 +35,7 @@ export class TextAreaComponent extends HasChangeDetector implements OnInit {
   }
 
   onChange(event) {
-    this.stateSvc.dispatchSet(this.path, '', event.target.value);
+    const {path, stateSvc} = this;
+    stateSvc.dispatchSet(path, '', event.target.value);
   }
 }

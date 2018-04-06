@@ -57,7 +57,7 @@ export class InputComponent extends HasChangeDetector implements OnInit {
       if (value.length) v = Number(value);
     }
 
-    this.stateSvc.dispatchSet(path, '', v);
+    this.stateSvc.dispatchSet(path, null, v);
 
     //TODO: Support custom change handling.
     //if (onChange) onChange(event);
