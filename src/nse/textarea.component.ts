@@ -35,7 +35,8 @@ export class TextAreaComponent extends HasChangeDetector implements OnInit {
   }
 
   onChange(event) {
-    const {path, stateSvc} = this;
-    stateSvc.dispatchSet(path, '', event.target.value);
+    // We don't need to use a CaptureType here because the
+    // TextArea component should only used with string properties.
+    this.stateSvc.dispatchSet(this.path, '', event.target.value);
   }
 }

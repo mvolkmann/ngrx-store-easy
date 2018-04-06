@@ -57,6 +57,9 @@ export class InputComponent extends HasChangeDetector implements OnInit {
       if (value.length) v = Number(value);
     }
 
+    // We don't need to use a CaptureType here because the
+    // Input component should only used with string properties,
+    // or boolean if type is 'checkbox'.
     this.stateSvc.dispatchSet(path, null, v);
 
     //TODO: Support custom change handling.

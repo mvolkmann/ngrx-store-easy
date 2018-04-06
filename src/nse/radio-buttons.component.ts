@@ -58,6 +58,8 @@ export class RadioButtonsComponent extends HasChangeDetector implements OnInit {
   }
 
   onChange(event) {
-    this.stateSvc.dispatchSet(this.path, '', event.target.value);
+    // We don't need to use a CaptureType here because the
+    // RadioButtons component should only used with boolean properties.
+    this.stateSvc.dispatchSet(this.path, null, event.target.value);
   }
 }

@@ -412,6 +412,7 @@ export class StateService {
   }
 
   watch(path: string, obj: Object, property: string): Subscription {
+    if (!obj) throw new Error('watch called with no obj');
     return this.getObservable(path).subscribe(value => {
       obj[property] = value;
       if (obj instanceof HasChangeDetector) obj.markForCheck();

@@ -59,6 +59,8 @@ export class CheckboxesComponent implements OnInit {
   }
 
   onChange(event, path) {
-    this.stateSvc.dispatchSet(path, true, event.target.checked);
+    // We don't need to use a CaptureType here because the
+    // Checkboxes component should only used with boolean properties.
+    this.stateSvc.dispatchSet(path, null, event.target.checked);
   }
 }

@@ -46,6 +46,8 @@ export class SelectComponent extends HasChangeDetector implements OnInit {
   }
 
   onChange(event) {
-    this.stateSvc.dispatchSet(this.path, '', event.target.value);
+    // We don't need to use a CaptureType here because the
+    // Select component should only used with string or number properties.
+    this.stateSvc.dispatchSet(this.path, null, event.target.value);
   }
 }
