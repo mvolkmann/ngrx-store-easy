@@ -10,20 +10,20 @@ interface Action {
 }
 type StateType = Object;
 
-const DELETE: string = '@@delete';
-const FILTER: string = '@@filter';
-const INIT: string = '@@init';
-const MAP: string = '@@map';
-const PATH_DELIMITER: string = '.';
-const PUSH: string = '@@push';
-const SET: string = '@@set';
-const TRANSFORM: string = '@@transform';
-const STATE_KEY: string = 'reduxState';
+const DELETE = '@@delete';
+const FILTER = '@@filter';
+const INIT = '@@init';
+const MAP = '@@map';
+const PATH_DELIMITER = '.';
+const PUSH = '@@push';
+const SET = '@@set';
+const TRANSFORM = '@@transform';
+const STATE_KEY = 'reduxState';
 
 const reducers = {
   '@ngrx/store/init': () => null,
   '@@redux/INIT': () => null,
-  '@@async': (state, payload) => payload,
+  '@@async': (state: Object, payload: any) => payload,
   [DELETE]: deletePath,
   [FILTER]: filterPath,
   [INIT]: initState,
@@ -60,14 +60,14 @@ export class HasChangeDetector {
   }
 }
 
+export type ReducerFn = (state: StateType, payload?: any) => StateType;
+
 // ng-packagr doesn't allow use of an anonymous function here.
 //const metaReducers = [() => reducer];
-export function getReducer() {
+export function getReducer(): ReducerFn {
   return reducer;
 }
 export const metaReducers = [getReducer];
-
-export type ReducerFn = (state: StateType, payload?: any) => StateType;
 
 function deepFreeze(obj: Object, freezing: Object[] = []): void {
   //TODO: When running "npm run package" it complains
@@ -318,7 +318,7 @@ export class StateService {
   /**
    * This deletes the property at path.
    */
-  dispatchDelete(path): void {
+  dispatchDelete(path: string): void {
     this.dispatch(DELETE + ' ' + path, path);
   }
 
@@ -352,7 +352,7 @@ export class StateService {
   /**
    * This adds elements to the end of the array at path.
    */
-  dispatchPush<T>(path, type: CaptureType<T>, ...elements: T[]): void {
+  dispatchPush<T>(path: string, type: CaptureType<T>, ...elements: T[]): void {
     this.dispatch(PUSH + ' ' + path, {path, value: elements});
   }
 
@@ -372,7 +372,7 @@ export class StateService {
     this.dispatch(TRANSFORM + ' ' + path, {path, value});
   }
 
-  getObservable(path): Observable<any> {
+  getObservable(path: string): Observable<any> {
     const {store} = this;
     const parts = path.split('.');
     return store.select.apply(store, parts);
@@ -394,9 +394,9 @@ export class StateService {
     return this.state.getValue();
   }
 
-  handleAsyncAction(promise): void {
+  handleAsyncAction(promise: Promise<any>): void {
     promise
-      .then(newState => this.dispatch('@@async', newState))
+      .then((newState: Object) => this.dispatch('@@async', newState))
       .catch(handleError);
   }
 
@@ -413,7 +413,7 @@ export class StateService {
 
   watch(path: string, obj: Object, property: string): Subscription {
     if (!obj) throw new Error('watch called with no obj');
-    return this.getObservable(path).subscribe(value => {
+    return this.getObservable(path).subscribe((value: any) => {
       obj[property] = value;
       if (obj instanceof HasChangeDetector) obj.markForCheck();
     });

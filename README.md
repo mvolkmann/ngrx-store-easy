@@ -54,15 +54,6 @@ In `app.module.ts`, add the following imports:
 import {NseModule} from '../nse/nse.module';
 ```
 
-Add the following to the `declarations` array:
-```js
-NseCheckboxesComponent,
-NseInputComponent,
-NseRadioButtonsComponent,
-NseSelectComponent,
-NseTextAreaComponent,
-```
-
 Add NseModule following to the `imports` array.
 
 If custom reducers are needed, define them
@@ -94,7 +85,7 @@ do something like the following:
 
 ```js
 import {StateService} from 'ngrx-store-easy';
-// Inject StateSvc.
+// Inject StateService as stateSvc.
 ...
     // This assumes that addReducer was called earlier to define
     // a reducer function for the action type "setFirstName".
